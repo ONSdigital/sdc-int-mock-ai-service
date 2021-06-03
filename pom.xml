@@ -3,30 +3,30 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>census-mock-case-api-service</artifactId>
+  <groupId>ons.sdc.int.app</groupId>
+  <artifactId>mock-ai</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <parent>
-    <groupId>uk.gov.ons.ctp.integration</groupId>
-    <artifactId>census-int-common-config</artifactId>
-    <version>0.0.17</version>
+    <groupId>ons.sdc.int.common</groupId>
+    <artifactId>common</artifactId>
+    <!-- change this to the version of ALL common libs to be used by this build -->
+    <version>1.0.4</version>
   </parent>
 
-  <name>Census Mock Case API Service</name>
-  <description>Census Mock Case API Service for local development</description>
+  <name>SDC : Integrations Mock AI Service</name>
+  <description>SDC : Integrations Mock AI Service</description>
 
   <properties>
     <skip.integration.tests>true</skip.integration.tests>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <powermock-version>2.0.0</powermock-version>
   </properties>
 
   <scm>
-    <connection>scm:git:https://github.com/ONSdigital/census-contact-centre-service</connection>
-    <developerConnection>scm:git:https://github.com/ONSdigital/census-contact-centre-service</developerConnection>
-    <url>https://github.com/ONSdigital/census-contact-centre-service</url>
+    <connection>scm:git:https://github.com/ONSdigital/sdc-int-mock-ai-service</connection>
+    <developerConnection>scm:git:https://github.com/ONSdigital/sdc-int-mock-ai-service</developerConnection>
+    <url>https://github.com/ONSdigital/sdc-int-mock-ai-service</url>
     <tag>HEAD</tag>
   </scm>
 
@@ -122,28 +122,28 @@
     <!-- ONS libraries -->
 
     <dependency>
-      <groupId>uk.gov.ons.ctp.integration.common</groupId>
+      <groupId>ons.sdc.int.common</groupId>
       <artifactId>framework</artifactId>
-      <version>0.0.73</version>
+      <version>${project.parent.version}</version>
     </dependency>
 
     <dependency>
-      <groupId>uk.gov.ons.ctp.integration.common</groupId>
+      <groupId>ons.sdc.int.common</groupId>
       <artifactId>test-framework</artifactId>
-      <version>0.0.18</version>
+      <version>${project.parent.version}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
-      <groupId>uk.gov.ons.ctp.integration.common</groupId>
+      <groupId>ons.sdc.int.common</groupId>
       <artifactId>product-reference</artifactId>
-      <version>1.0.12</version>
+      <version>${project.parent.version}</version>
     </dependency>
 
     <dependency>
-      <groupId>uk.gov.ons.ctp.integration.common</groupId>
-      <artifactId>census-int-case-api-client</artifactId>
-      <version>0.0.20</version>
+      <groupId>ons.sdc.int.common</groupId>
+      <artifactId>case-api-client</artifactId>
+      <version>${project.parent.version}</version>
     </dependency>
     <!-- ONS END -->
 
