@@ -1,0 +1,64 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: mockcaseapi
+  labels:
+    app: mockcaseapi
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      name: mockcaseapi
+      labels:
+        app: mockcaseapi
+    spec:
+      containers:
+      - name: mockcaseapi
+        image: eu.gcr.io/census-gcr-int/census-mock-case-api-service:0.19.0-rc.1
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "0.1"
+            memory: "512Mi"
+          limits:
+            cpu: "0.5"
+            memory: "1024Mi"
+        readinessProbe:
+          httpGet:
+            path: /info
+            port: 8161
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          failureThreshold: 3
+          successThreshold: 1
+        livenessProbe:
+          httpGet:
+            path: /info
+            port: 8161
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          failureThreshold: 3
+          successThreshold: 1
+        ports:
+        - name: http-server
+          containerPort: 8161
+        env:
+        - name: JAVA_TOOL_OPTIONS
+          value: "-Dlogging.useJson=true
+            -Dspring.profiles.active=test
+            -Dlogging.level.uk.gov.ons.ctp=DEBUG
+            -Dlogging.level.org.springframework=WARN
+            -Dendpoints.autoconfig.enabled=false-Dendpoints.beans.enabled=false
+            -Dendpoints.configprops.enabled=false
+            -Dendpoints.dump.enabled=false
+            -Dendpoints.env.enabled=false
+            -Dendpoints.metrics.enabled=false
+            -Dendpoints.mapping.enabled=false
+            -Dendpoints.shutdown.enabled=false
+            -Dendpoints.trace.enabled=false
+            -Dmanagement.health.rabbit.enabled=false"
