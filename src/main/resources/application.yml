@@ -57,3 +57,14 @@ spring:
   application:
     name: ONS CensusMockCaseApiService
 
+address-index:
+  token: 
+  rest-client-config:
+    scheme: https
+    host: whitelodge-eq-ai-api.census-gcp.onsdigital.uk
+    port: 443
+    connection-manager-default-max-per-route: 100
+    connection-manager-max-total: 100
+    connectTimeoutMillis: 0
+    connectionRequestTimeoutMillis: 0
+    socketTimeoutMillis: 0

@@ -14,5 +14,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CaseQueryRequestDTO {
 
-  private Boolean caseEvents = false;
+  private Boolean caseEvents = true;
 }
