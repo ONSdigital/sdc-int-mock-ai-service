@@ -18,8 +18,8 @@ public class AddressesPostcodeRequestDTO {
   private boolean historical = true;
 
   private boolean verbose = true;
-    
+
   private String epoch;
-  
+
   private boolean includeauxiliarysearch = false;
 }

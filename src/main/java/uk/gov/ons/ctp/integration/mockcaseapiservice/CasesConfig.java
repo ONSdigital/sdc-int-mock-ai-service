@@ -9,10 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.validator.routines.checkdigit.LuhnCheckDigit;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.CTPException.Fault;
 import uk.gov.ons.ctp.integration.caseapiclient.caseservice.model.CaseContainerDTO;
@@ -20,8 +18,6 @@ import uk.gov.ons.ctp.integration.caseapiclient.caseservice.model.EventDTO;
 
 @Configuration
 @EnableConfigurationProperties
-@PropertySource(factory = YamlPropertySourceFactory.class, value = "classpath:cases.yml")
-@ConfigurationProperties("casedata")
 public class CasesConfig {
 
   private LuhnCheckDigit luhnChecker = new LuhnCheckDigit();

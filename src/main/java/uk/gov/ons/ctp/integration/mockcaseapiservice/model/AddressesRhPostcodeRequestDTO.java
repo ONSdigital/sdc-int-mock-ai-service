@@ -18,9 +18,9 @@ public class AddressesRhPostcodeRequestDTO {
   private boolean historical = true;
 
   private boolean verbose = true;
-  
+
   private boolean favourpaf = true;
   private boolean favourwelsh = false;
-  
+
   private String epoch;
 }

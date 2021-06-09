@@ -1,20 +1,20 @@
 package uk.gov.ons.ctp.integration.mockcaseapiservice.client;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-
 import com.godaddy.logging.Logger;
 import com.godaddy.logging.LoggerFactory;
-
+import java.util.HashMap;
+import java.util.Map;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.CTPException.Fault;
 import uk.gov.ons.ctp.common.rest.RestClient;
 
+/**
+ * This class is responsible for talking to Address Index.
+ *
+ * <p>It's used to capture AI responses that can be used for AI simulation.
+ */
 public class AddressIndexClient {
   private static final Logger log = LoggerFactory.getLogger(AddressIndexClient.class);
 
@@ -30,10 +30,8 @@ public class AddressIndexClient {
       throw new CTPException(Fault.RESOURCE_NOT_FOUND, "AI token not set: " + "AI_TOKEN");
     }
   }
-  
-  /** 
-   * Get AI address data by postcode. RH version.
-   */
+
+  /** Get AI address data by postcode. RH version. */
   public String getAddressesRhPostcode(String postcode) {
 
     String path = "/addresses/rh/postcode/{postcode}";
@@ -70,19 +68,20 @@ public class AddressIndexClient {
     Map<String, String> headerParams = new HashMap<String, String>();
 
     headerParams.put("Authorization: ", "Bearer " + aiToken);
-    
+
     MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
 
     return invokeAI(path, queryParams, postcode);
   }
-  
-  private String invokeAI(String path, MultiValueMap<String, String> queryParams, String... postcode) {
+
+  private String invokeAI(
+      String path, MultiValueMap<String, String> queryParams, String... postcode) {
     Map<String, String> headerParams = new HashMap<String, String>();
 
     headerParams.put("Authorization: ", "Bearer " + aiToken);
-    
-    String r = restClient.getResource(path, String.class, headerParams, queryParams, postcode);
+
+    String r =
+        restClient.getResource(path, String.class, headerParams, queryParams, (Object[]) postcode);
     return r;
   }
-  
 }

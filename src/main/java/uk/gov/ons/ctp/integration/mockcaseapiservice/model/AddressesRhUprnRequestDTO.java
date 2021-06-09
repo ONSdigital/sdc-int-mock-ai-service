@@ -1,7 +1,6 @@
 package uk.gov.ons.ctp.integration.mockcaseapiservice.model;
 
 import javax.validation.constraints.NotNull;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,12 +10,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AddressesRhUprnRequestDTO {
 
-  @NotNull 
-  private String addresstype;
-  
+  @NotNull private String addresstype;
+
   private boolean historical = true;
 
   private boolean verbose = true;
-  
+
   private String epoch;
 }

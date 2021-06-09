@@ -10,7 +10,7 @@ public enum RequestType {
   AI_RH_UPRN("/addresses/rh/uprn");
 
   private String path;
-	
+
   RequestType(String path) {
     this.path = path;
   }
