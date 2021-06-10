@@ -28,8 +28,8 @@ import uk.gov.ons.ctp.integration.mockai.model.AddressesRhPostcodeRequestDTO;
  */
 @RestController
 @RequestMapping(value = "", produces = "application/json")
-public final class CaptureAddressesEndpoints implements CTPEndpoint {
-  private static final Logger log = LoggerFactory.getLogger(CaptureAddressesEndpoints.class);
+public final class CaptureAddressesEndpoint implements CTPEndpoint {
+  private static final Logger log = LoggerFactory.getLogger(CaptureAddressesEndpoint.class);
 
   @Autowired private AddressIndexClient addressIndexClient;
 

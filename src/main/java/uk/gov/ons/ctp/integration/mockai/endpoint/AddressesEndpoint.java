@@ -23,8 +23,8 @@ import uk.gov.ons.ctp.integration.mockai.model.AddressesRhPostcodeRequestDTO;
 /** Provides mock endpoints for a subset of the AI /addresses endpoints. */
 @RestController
 @RequestMapping(value = "", produces = "application/json")
-public final class AddressesEndpoints implements CTPEndpoint {
-  private static final Logger log = LoggerFactory.getLogger(AddressesEndpoints.class);
+public final class AddressesEndpoint implements CTPEndpoint {
+  private static final Logger log = LoggerFactory.getLogger(AddressesEndpoint.class);
 
   @RequestMapping(value = "/addresses/info", method = RequestMethod.GET)
   public ResponseEntity<String> info() {
@@ -46,7 +46,7 @@ public final class AddressesEndpoints implements CTPEndpoint {
     log.with("postcode", postcode).info("Request " + requestType.getPath() + "/" + postcode);
 
     postcode = postcode.replaceAll(" ", "").trim();
-    String response = readDataFile(requestType, postcode);
+    String response = simulateAIResponse(requestType, postcode);
     
     return response;
   }
@@ -58,7 +58,7 @@ public final class AddressesEndpoints implements CTPEndpoint {
     log.with("input", input).info("Request " + requestType.getPath());
 
     String cleanedInput = input.replaceAll(" ", "-").trim();
-    String response = readDataFile(requestType, cleanedInput);
+    String response = simulateAIResponse(requestType, cleanedInput);
     
     return response;
   }
@@ -70,7 +70,7 @@ public final class AddressesEndpoints implements CTPEndpoint {
     log.with("postcode", postcode).info("Request " + requestType.getPath() + "/" + postcode);
 
     postcode = postcode.replaceAll(" ", "").trim();
-    String response = readDataFile(requestType, postcode);
+    String response = simulateAIResponse(requestType, postcode);
       
     return response;
   }
@@ -82,12 +82,29 @@ public final class AddressesEndpoints implements CTPEndpoint {
     log.with("uprn", uprn).info("Request " + requestType.getPath() + "/" + uprn);
 
     uprn = uprn.replaceAll(" ", "").trim();
-    String response = readDataFile(requestType, uprn);
+    String response = simulateAIResponse(requestType, uprn);
       
     return response;
   }
 
-  private String readDataFile(RequestType requestType, String baseFileName) throws IOException {
+  private String simulateAIResponse(RequestType requestType, String baseFileName) throws IOException {
+    String response = readCapturedAiResponse(requestType, baseFileName);
+    
+    if (response == null) {
+      response = readCapturedAiResponse(requestType, "notFound");
+      
+      // Replace any place holders with actual values
+      String placeholderName = requestType.getPlaceholderName();
+      if (placeholderName != null) {
+        String fullPlaceholderName = "%" + placeholderName + "%";
+        response = response.replace(fullPlaceholderName, baseFileName);
+      }
+    }
+    
+    return response;
+  }
+  
+  private String readCapturedAiResponse(RequestType requestType, String baseFileName) throws IOException {
     // Discover the location of the 'data' directory
     ClassLoader classLoader = getClass().getClassLoader();
     URL targetDataUrl = classLoader.getResource("data");
@@ -97,6 +114,11 @@ public final class AddressesEndpoints implements CTPEndpoint {
     File targetCaptureDir = new File(targetDataDir, requestType.getPath());
     String capturedFileName = baseFileName + ".json";
     File capturedFile = new File(targetCaptureDir, capturedFileName);
+    
+    if (!capturedFile.exists()) {
+      log.with("baseFileName", baseFileName).with("fileName", capturedFile.getAbsoluteFile()).info("No captured response");
+      return null;
+    }
     
     // Read captured AI response
     String response = Files.readString(capturedFile.toPath());
