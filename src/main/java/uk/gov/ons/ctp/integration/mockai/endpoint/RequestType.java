@@ -14,11 +14,11 @@ public enum RequestType {
   private String placeholderName;
 
   private RequestType(String url, String placeholderName) {
-      this.url = url;
-      this.placeholderName = placeholderName;
-      
-      this.path = url.replaceAll("/\\{.*\\}", "");
-      System.out.println("url: " + url);
-      System.out.println("path: " + path);
-    }
+    this.url = url;
+    this.placeholderName = placeholderName;
+
+    this.path = url.replaceAll("/\\{.*\\}", "");
+    System.out.println("url: " + url);
+    System.out.println("path: " + path);
+  }
 }

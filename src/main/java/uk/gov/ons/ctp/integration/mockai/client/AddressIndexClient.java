@@ -33,9 +33,7 @@ public class AddressIndexClient {
     }
   }
 
-  /** 
-   * Get AI address data by postcode. RH version. 
-   */
+  /** Get AI address data by postcode. RH version. */
   public String getAddressesRhPostcode(String postcode) {
     return invokeAI(RequestType.AI_RH_POSTCODE.getUrl(), null, postcode);
   }
@@ -67,8 +65,9 @@ public class AddressIndexClient {
     Map<String, String> headerParams = new HashMap<String, String>();
     headerParams.put("Authorization: ", "Bearer " + aiToken);
 
-    String response = restClient.getResource(path, String.class, headerParams, queryParams, 
-        (Object[]) pathParams);
+    String response =
+        restClient.getResource(
+            path, String.class, headerParams, queryParams, (Object[]) pathParams);
 
     return response;
   }
