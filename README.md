@@ -22,77 +22,43 @@ This will create the JAR file in the Target directory. You can then right-click 
 
 When running successfully version information can be obtained from the info endpoint
     
-* localhost:8161/cases/info
-
-Data examples can be viewed from the examples endpoint
-
-* localhost:8161/cases/examples
+* localhost:8161/info
+* localhost:8161/addresses/info
+* localhost:8161/capture/info
 
 ## Manual testing
 
-### Adding case data
+### Addresses endpoints 
 
-To add a new case:
+These endpoints return AI captured responses which are held within the data resources directory. 
+If no data is held for a particular search query then a default 'notFound' response is returned. This mirrors the
+behaviour of AI if it is also asked for data which it doesn't hold.
 
-    // Create case data file
-    cat > /tmp/new_case.json << EOF
-    [
-      {
-       "caseRef": "6757766",
-       "arid": "2344266233",
-       "estabArid": "AABBCC",
-       "estabType": "ET",
-       "uprn": "1347459999",
-       "createdDateTime": "2020-01-09T11:52:05.006+01:00",
-       "addressLine1": "Napier House",
-       "addressLine2": "88 Harbour Street",
-       "addressLine3": "Parkhead",
-       "townName": "Glasgow",
-       "postcode": "G1 2AA",
-       "organisationName": "ON",
-       "addressLevel": "E",
-       "abpCode": "AACC",
-       "latitude": "41.40338",
-       "longitude": "2.17403",
-       "oa": "EE22",
-       "lsoa": "x1",
-       "msoa": "x2",
-       "lad": "H1",
-       "caseEvents": [],
-       "id": "0779ccfb-584c-486f-b36f-667fdf7f8723",
-       "caseType": "CE",
-       "region": "E",
-       "state": "ACTIONABLE",
-       "collectionExerciseId": "6334804d-fc8e-4838-b4ee-9a95ea969488",
-       "surveyType": "CCS"
-     }
-     ]
-    EOF
+    curl -s localhost:8161/addresses/rh/postcode/SO93a
     
-    // Publish the new case(s) to the fake case service
-    curl -s --data @/tmp/new_case.json -H "Content-Type: application/json" http://localhost:8161/cases/data/cases/add
-
-
-### New questionnaire ID
-
-To get a new Questionnaire ID for a case:
+    curl -s localhost:8161/addresses/partial?input=High%20Street
     
-    // Get new CE questionnaire ID for a CE
-    curl -s -H "Content-Type: application/json" "http://localhost:8161/cases/0779ccfb-584c-486f-b36f-667fdf7f8723/qid" | jq
-    // Get new questionnaire ID for individual in a CE
-    curl -s -H "Content-Type: application/json" "http://localhost:8161/cases/0779ccfb-584c-486f-b36f-667fdf7f8723/qid?individual=true" | jq
+    curl -s localhost:8161/addresses/postcode/SO155NF
+    
+    curl -s localhost:8161/addresses/rh/uprn/3244
+    
+    curl -s localhost:8161/addresses/info
 
-    // Get new HH questionnaire ID for a HH
-    curl -s -H "Content-Type: application/json" "http://localhost:8161/cases/3305e937-6fb1-4ce1-9d4c-077f147789ac/qid" | jq
-    // Get new questionnaireId for an individual in a HH
-    curl -s -H "Content-Type: application/json" "http://localhost:8161/cases/3305e937-6fb1-4ce1-9d4c-077f147789ac/qid?individual=true&individualCaseId=f91995ac-71d8-42d5-a454-edd02028de73" | jq
+### Capture endpoints
 
+These are the same as the addresses endpoints except that they start with '/capture'. This causes the mock-ai
+to make a call to AI and store the result in a data file. Subsequent calls to the addresses endpoints will 
+return the captured data.
 
-## Docker image build
-Is switched off by default for clean deploy. Switch on with;
-
-* mvn dockerfile:build -Dskip.dockerfile=false
-
+    curl -s localhost:8161/capture/addresses/rh/postcode/DN370AA
+    
+    curl -s localhost:8161/capture/addresses/partial?input=High%20Street
+    
+    curl -s localhost:8161/capture/addresses/postcode/DN370AA
+    
+    curl -s localhost:8161/capture/addresses/rh/uprn/3244
+    
+    curl -s localhost:8161/capture/info
     
 ## Copyright
 Copyright (C) 2021 Crown Copyright (Office for National Statistics)
