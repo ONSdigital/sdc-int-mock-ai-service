@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.integration.mockcaseapiservice.model;
+package uk.gov.ons.ctp.integration.mockai.model;
 
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

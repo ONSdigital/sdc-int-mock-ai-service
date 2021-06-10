@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.integration.mockcaseapiservice.model;
+package uk.gov.ons.ctp.integration.mockai.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddressesPostcodeRequestDTO {
+public class AddressesRhPostcodeRequestDTO {
 
   private int offset = 0;
 
@@ -19,7 +19,8 @@ public class AddressesPostcodeRequestDTO {
 
   private boolean verbose = true;
 
-  private String epoch;
+  private boolean favourpaf = true;
+  private boolean favourwelsh = false;
 
-  private boolean includeauxiliarysearch = false;
+  private String epoch;
 }

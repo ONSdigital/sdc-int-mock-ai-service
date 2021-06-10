@@ -1,15 +1,7 @@
-[![Build Status](https://travis-ci.com/ONSdigital/census-mock-case-api-service.svg?branch=master)](https://travis-ci.com/ONSdigital/census-mock-case-api-service)
 
+# Mock AI
+This repository is a test service and can be run instead of the an Address Index service.
 
-# Census Mock Case API Service
-This repository is a test service and can be run instead of the case api service to test other services. It returns cases and questionnaires that are stored as JSON in 2 yml files 
-(cases.yml and questionnaires.yml) in the resources folder of the project. The project facilitates testing of services that rely on the real case api services, currently the contact centre service and filed services. 
-
-## Set Up
-Do the following steps to set up the code to run locally:
-* Install Java 11 locally
-* Make sure that you have a suitable settings.xml file in your local .m2 directory
-* Clone the census-contact-centre locally
 
 ## Running
 
@@ -103,5 +95,5 @@ Is switched off by default for clean deploy. Switch on with;
 
     
 ## Copyright
-Copyright (C) 2019 Crown Copyright (Office for National Statistics)
+Copyright (C) 2021 Crown Copyright (Office for National Statistics)
 

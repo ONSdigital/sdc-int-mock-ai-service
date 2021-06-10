@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.integration.mockcaseapiservice.endpoint;
+package uk.gov.ons.ctp.integration.mockai.endpoint;
 
 import com.godaddy.logging.Logger;
 import com.godaddy.logging.LoggerFactory;
@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.ons.ctp.common.endpoint.CTPEndpoint;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.CTPException.Fault;
-import uk.gov.ons.ctp.integration.mockcaseapiservice.client.AddressIndexClient;
-import uk.gov.ons.ctp.integration.mockcaseapiservice.model.AddressesRhPostcodeRequestDTO;
+import uk.gov.ons.ctp.integration.mockai.client.AddressIndexClient;
+import uk.gov.ons.ctp.integration.mockai.model.AddressesRhPostcodeRequestDTO;
 
 /**
  * This set of endpoints capture AI responses for a subset of the /addresses endpoints.
@@ -38,10 +38,10 @@ public final class CaptureAddressesEndpoints implements CTPEndpoint {
     return ResponseEntity.ok(
         "      << MOCK AI >>\n"
             + "Supported endpoints for data capture:\n"
-            + "  /capture/addresses/rh/postcode/{postcode} \n"
-            + "  /capture/addresses/partial \n"
-            + "  /capture/addresses/postcode/{postcode} \n"
-            + "  /capture/addresses/rh/uprn \n");
+            + "  /capture/" + RequestType.AI_RH_POSTCODE.getUrl() + "\n"
+            + "  /capture/" + RequestType.AI_PARTIAL.getUrl() + "\n"
+            + "  /capture/" + RequestType.AI_POSTCODE.getUrl() + "\n"
+            + "  /capture/" + RequestType.AI_RH_UPRN.getUrl() + "\n");
   }
 
   @RequestMapping(value = "/capture/addresses/rh/postcode/{postcode}", method = RequestMethod.GET)
@@ -49,11 +49,14 @@ public final class CaptureAddressesEndpoints implements CTPEndpoint {
       @PathVariable(value = "postcode") String rawPostcode,
       @Valid AddressesRhPostcodeRequestDTO requestParamsDTO)
       throws CTPException, IOException {
+      
+    RequestType requestType = RequestType.AI_RH_POSTCODE;
     String postcode = rawPostcode.replaceAll(" ", "").trim();
-    log.with("postcode", rawPostcode).info("Request /capture/addresses/rh/postcode/" + rawPostcode);
+    log.with("postcode", rawPostcode).info("Request " + requestType.getPath() + "/" + postcode);
 
+    // Hit AI and save results
     String result = addressIndexClient.getAddressesRhPostcode(postcode);
-    saveAiResponse(RequestType.AI_RH_POSTCODE, postcode, result);
+    saveAiResponse(requestType, postcode, result);
 
     return result;
   }
@@ -61,11 +64,14 @@ public final class CaptureAddressesEndpoints implements CTPEndpoint {
   @RequestMapping(value = "/capture/addresses/partial", method = RequestMethod.GET)
   public String getAddressesPartial(@RequestParam(required = true) String input)
       throws IOException, CTPException {
-    log.with("input", input).info("Request /capture/addresses/partial");
 
+    RequestType requestType = RequestType.AI_PARTIAL;
+    log.with("input", input).info("Request " + requestType.getUrl());
+
+    // Hit AI and save results
     String result = addressIndexClient.getAddressesPartial(input);
-    String cleanedInput = input.replaceAll(" ", "-").trim();
-    saveAiResponse(RequestType.AI_PARTIAL, cleanedInput, result);
+    String cleanedInput = input.replaceAll(" ", "-").trim();  // For sensible file name
+    saveAiResponse(requestType, cleanedInput, result);
 
     return result;
   }
@@ -73,46 +79,55 @@ public final class CaptureAddressesEndpoints implements CTPEndpoint {
   @RequestMapping(value = "/capture/addresses/postcode/{postcode}", method = RequestMethod.GET)
   public String getAddressesPostcode(@PathVariable(value = "postcode") String rawPostcode)
       throws IOException, CTPException {
+ 
+    RequestType requestType = RequestType.AI_POSTCODE;
     String postcode = rawPostcode.replaceAll(" ", "").trim();
-    log.with("postcode", postcode).info("Request /capture/addresses/postcode/{postcode}");
+    log.with("postcode", postcode).info("Request " + requestType.getPath() + "/" + rawPostcode);
 
+    // Hit AI and save results
     String result = addressIndexClient.getAddressesPostcode(postcode);
-    saveAiResponse(RequestType.AI_POSTCODE, postcode, result);
+    saveAiResponse(requestType, postcode, result);
 
     return result;
   }
 
+  
   @RequestMapping(value = "/capture/addresses/rh/uprn/{uprn}", method = RequestMethod.GET)
-  public String getRhPostcode(@PathVariable(value = "uprn") String rawUprn)
+  public String getRhPostcode(@PathVariable(value = "uprn") String uprn)
       throws IOException, CTPException {
-    String uprn = rawUprn.replaceAll(" ", "").trim();
-    log.with("uprn", uprn).info("Request /capture/addresses/rh/uprn/{uprn}");
 
+    RequestType requestType = RequestType.AI_RH_UPRN;
+    uprn = uprn.trim();
+    log.with("uprn", uprn).info("Request " + requestType.getPath() + "/" + uprn);
+
+    // Hit AI and save results
     String result = addressIndexClient.getAddressesRhUprn(uprn);
-    saveAiResponse(RequestType.AI_RH_UPRN, uprn, result);
+    saveAiResponse(requestType, uprn, result);
 
     return result;
   }
 
+  
   private void saveAiResponse(RequestType requestType, String baseFileName, String json)
       throws IOException, CTPException {
-    // Discover the location of the 'data' directory
+    // Discover the location of the 'data' resource directory
     ClassLoader classLoader = getClass().getClassLoader();
     URL targetDataUrl = classLoader.getResource("data");
     File targetDataDir = new File(targetDataUrl.getFile());
 
-    // Output json data to file in the compiled target file hierarchy
+    // Output json data to file in the compiled target file hierarchy (so that it can be immediately used)
     File targetCaptureDir = new File(targetDataDir, requestType.getPath());
     String outputFileName = baseFileName + ".json";
     writeJsonFile(targetCaptureDir, outputFileName, json, false);
 
-    // Output json data to file in the source tree
+    // Output json data to file in the source tree (for long term storage)
     File mockAiDir = targetDataDir.getParentFile().getParentFile().getParentFile();
     File srcDataDir = new File(mockAiDir, "src/main/resources/data");
     File srcCaptureDir = new File(srcDataDir, requestType.getPath());
     writeJsonFile(srcCaptureDir, outputFileName, json, true);
   }
 
+  
   private void writeJsonFile(File dir, String fileName, String json, boolean failIfNoTargetDir)
       throws CTPException, IOException {
     if (!dir.exists()) {
@@ -126,9 +141,9 @@ public final class CaptureAddressesEndpoints implements CTPEndpoint {
       }
     }
 
+    // Write AI response json to file
     File outputFile = new File(dir, fileName);
     log.with("outputFile", outputFile.getAbsoluteFile()).info("Saving AI data to json file");
-    System.out.println("PMB: outputFile:" + outputFile.getAbsoluteFile());
     Files.write(outputFile.toPath(), json.getBytes());
   }
 }

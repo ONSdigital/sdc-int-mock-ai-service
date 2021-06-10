@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.integration.mockcaseapiservice.client;
+package uk.gov.ons.ctp.integration.mockai.client;
 
 import com.godaddy.logging.Logger;
 import com.godaddy.logging.LoggerFactory;
@@ -9,6 +9,7 @@ import org.springframework.util.MultiValueMap;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.CTPException.Fault;
 import uk.gov.ons.ctp.common.rest.RestClient;
+import uk.gov.ons.ctp.integration.mockai.endpoint.RequestType;
 
 /**
  * This class is responsible for talking to Address Index.
@@ -25,63 +26,50 @@ public class AddressIndexClient {
     this.restClient = restClient;
     this.aiToken = aiToken.trim();
 
+    // Fail if the AI security token has not been set
     if (this.aiToken.isEmpty()) {
       log.with("TokenName", "AI_TOKEN").error("Address Index token not set. Unable to contact AI.");
       throw new CTPException(Fault.RESOURCE_NOT_FOUND, "AI token not set: " + "AI_TOKEN");
     }
   }
 
-  /** Get AI address data by postcode. RH version. */
+  /** 
+   * Get AI address data by postcode. RH version. 
+   */
   public String getAddressesRhPostcode(String postcode) {
-
-    String path = "/addresses/rh/postcode/{postcode}";
-    String r = invokeAI(path, postcode);
-    System.out.println("Result: " + r);
-    return r;
+    return invokeAI(RequestType.AI_RH_POSTCODE.getUrl(), null, postcode);
   }
 
   public String getAddressesPartial(String input) {
-    String path = "/addresses/partial";
 
     MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
     queryParams.add("input", input);
-    String r = invokeAI(path, queryParams, (String) null);
-    System.out.println("Result: " + r);
-    return r;
+
+    String response = invokeAI(RequestType.AI_PARTIAL.getUrl(), queryParams, (String) null);
+    return response;
   }
 
   public String getAddressesPostcode(String postcode) {
-    String path = "/addresses/postcode/{postcode}";
-    String r = invokeAI(path, postcode);
-    System.out.println("Result: " + r);
-    return r;
+    return invokeAI(RequestType.AI_POSTCODE.getUrl(), null, postcode);
   }
 
   public String getAddressesRhUprn(String uprn) {
-    String path = "/addresses/rh/uprn/{uprn}";
-    String r = invokeAI(path, uprn);
-    System.out.println("Result: " + r);
-    return r;
-  }
-
-  private String invokeAI(String path, String... postcode) {
-    Map<String, String> headerParams = new HashMap<String, String>();
-
-    headerParams.put("Authorization: ", "Bearer " + aiToken);
-
-    MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
-
-    return invokeAI(path, queryParams, postcode);
+    return invokeAI(RequestType.AI_RH_UPRN.getUrl(), null, uprn);
   }
 
   private String invokeAI(
-      String path, MultiValueMap<String, String> queryParams, String... postcode) {
-    Map<String, String> headerParams = new HashMap<String, String>();
+      String path, MultiValueMap<String, String> queryParams, String... pathParams) {
 
+    if (queryParams == null) {
+      queryParams = new LinkedMultiValueMap<String, String>();
+    }
+
+    Map<String, String> headerParams = new HashMap<String, String>();
     headerParams.put("Authorization: ", "Bearer " + aiToken);
 
-    String r =
-        restClient.getResource(path, String.class, headerParams, queryParams, (Object[]) postcode);
-    return r;
+    String response = restClient.getResource(path, String.class, headerParams, queryParams, 
+        (Object[]) pathParams);
+
+    return response;
   }
 }

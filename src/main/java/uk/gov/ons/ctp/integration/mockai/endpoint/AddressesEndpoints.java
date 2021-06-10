@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.integration.mockcaseapiservice.endpoint;
+package uk.gov.ons.ctp.integration.mockai.endpoint;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +18,7 @@ import com.godaddy.logging.Logger;
 import com.godaddy.logging.LoggerFactory;
 
 import uk.gov.ons.ctp.common.endpoint.CTPEndpoint;
-import uk.gov.ons.ctp.integration.mockcaseapiservice.model.AddressesRhPostcodeRequestDTO;
+import uk.gov.ons.ctp.integration.mockai.model.AddressesRhPostcodeRequestDTO;
 
 /** Provides mock endpoints for a subset of the AI /addresses endpoints. */
 @RestController
@@ -30,53 +30,61 @@ public final class AddressesEndpoints implements CTPEndpoint {
   public ResponseEntity<String> info() {
     return ResponseEntity.ok(
         "      << MOCK AI >>\n"
-            + "Supported endpoints:\n"
-            + "  /addresses/rh/postcode/{postcode} \n"
-            + "  /addresses/partial \n"
-            + "  /addresses/postcode/{postcode} \n"
-            + "  /addresses/rh/uprn \n");
+            + "Supported addresses endpoints:\n"
+            + "  " + RequestType.AI_RH_POSTCODE.getUrl() + "\n"
+            + "  " + RequestType.AI_PARTIAL.getUrl() + "\n"
+            + "  " + RequestType.AI_POSTCODE.getUrl() + "\n"
+            + "  " + RequestType.AI_RH_UPRN.getUrl() + "\n");
   }
 
   @RequestMapping(value = "/addresses/rh/postcode/{postcode}", method = RequestMethod.GET)
   public String getAddressesRhPostcode(
       @PathVariable(value = "postcode") String postcode,
       @Valid AddressesRhPostcodeRequestDTO requestParamsDTO) throws IOException {
-    log.with("postcode", postcode).info("Request /addresses/rh/postcode/" + postcode);
+    RequestType requestType = RequestType.AI_RH_POSTCODE;
+
+    log.with("postcode", postcode).info("Request " + requestType.getPath() + "/" + postcode);
 
     postcode = postcode.replaceAll(" ", "").trim();
-    String response = readDataFile(RequestType.AI_RH_POSTCODE, postcode);
+    String response = readDataFile(requestType, postcode);
     
     return response;
   }
 
   @RequestMapping(value = "/addresses/partial", method = RequestMethod.GET)
   public String getAddressesPartial(@RequestParam(required = true) String input) throws IOException {
-    log.with("input", input).info("Request /addresses/partial");
+    RequestType requestType = RequestType.AI_PARTIAL;
+
+    log.with("input", input).info("Request " + requestType.getPath());
 
     String cleanedInput = input.replaceAll(" ", "-").trim();
-    String response = readDataFile(RequestType.AI_PARTIAL, cleanedInput);
+    String response = readDataFile(requestType, cleanedInput);
     
     return response;
   }
 
   @RequestMapping(value = "/addresses/postcode/{postcode}", method = RequestMethod.GET)
   public String getAddressesPostcode(@PathVariable(value = "postcode") String postcode) throws IOException {
-      log.with("postcode", postcode).info("Request /addresses/postcode/" + postcode);
+    RequestType requestType = RequestType.AI_POSTCODE;
 
-      postcode = postcode.replaceAll(" ", "").trim();
-      String response = readDataFile(RequestType.AI_POSTCODE, postcode);
+    log.with("postcode", postcode).info("Request " + requestType.getPath() + "/" + postcode);
+
+    postcode = postcode.replaceAll(" ", "").trim();
+    String response = readDataFile(requestType, postcode);
       
-      return response;
+    return response;
   }
 
   @RequestMapping(value = "/addresses/rh/uprn/{uprn}", method = RequestMethod.GET)
   public String getRhPostcode(@PathVariable(value = "uprn") String uprn) throws IOException {
-      log.with("uprn", uprn).info("Request /addresses/rh/uprn/" + uprn);
+    RequestType requestType = RequestType.AI_RH_UPRN;
 
-      uprn = uprn.replaceAll(" ", "").trim();
-      String response = readDataFile(RequestType.AI_RH_UPRN, uprn);
+    log.with("uprn", uprn).info("Request " + requestType.getPath() + "/" + uprn);
+
+    uprn = uprn.replaceAll(" ", "").trim();
+    String response = readDataFile(requestType, uprn);
       
-      return response;
+    return response;
   }
 
   private String readDataFile(RequestType requestType, String baseFileName) throws IOException {
@@ -85,25 +93,14 @@ public final class AddressesEndpoints implements CTPEndpoint {
     URL targetDataUrl = classLoader.getResource("data");
     File targetDataDir = new File(targetDataUrl.getFile());
 
-    // Output json data to file in the compiled target file hierarchy
+    // Build expected file name
     File targetCaptureDir = new File(targetDataDir, requestType.getPath());
     String capturedFileName = baseFileName + ".json";
     File capturedFile = new File(targetCaptureDir, capturedFileName);
-    String response = Files.readString(capturedFile.toPath());
     
+    // Read captured AI response
+    String response = Files.readString(capturedFile.toPath());
+
     return response;
-//    try (InputStream inputStream = classLoader.getResourceAsStream(fileName);
-//        InputStreamReader streamReader =
-//            new InputStreamReader(inputStream, StandardCharsets.UTF_8);
-//        BufferedReader reader = new BufferedReader(streamReader)) {
-//
-//      String line;
-//      while ((line = reader.readLine()) != null) {
-//        System.out.println(line);
-//      }
-//
-//    } catch (IOException e) {
-//      e.printStackTrace();
-//    }
   }
 }

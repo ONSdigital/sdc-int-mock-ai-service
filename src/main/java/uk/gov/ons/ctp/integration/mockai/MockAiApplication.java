@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.integration.mockcaseapiservice;
+package uk.gov.ons.ctp.integration.mockai;
 
 import com.godaddy.logging.Logger;
 import com.godaddy.logging.LoggerFactory;
@@ -17,15 +17,14 @@ import uk.gov.ons.ctp.common.error.RestExceptionHandler;
 import uk.gov.ons.ctp.common.jackson.CustomObjectMapper;
 import uk.gov.ons.ctp.common.rest.RestClient;
 import uk.gov.ons.ctp.common.rest.RestClientConfig;
-import uk.gov.ons.ctp.integration.mockcaseapiservice.client.AddressIndexClient;
-import uk.gov.ons.ctp.integration.mockcaseapiservice.config.AppConfig;
+import uk.gov.ons.ctp.integration.mockai.client.AddressIndexClient;
+import uk.gov.ons.ctp.integration.mockai.config.AppConfig;
 
-/** The 'main' entry point for the ContactCentre Svc SpringBoot Application. */
+/** The 'main' entry point for the Mock AI SpringBoot Application. */
 @SpringBootApplication
-// @ComponentScan(basePackages = {"uk.gov.ons.ctp.integration.mockcaseapiservice"})
 @EnableCaching
-public class MockCaseApiServiceApplication {
-  private static final Logger log = LoggerFactory.getLogger(MockCaseApiServiceApplication.class);
+public class MockAiApplication {
+  private static final Logger log = LoggerFactory.getLogger(MockAiApplication.class);
 
   @Autowired private AppConfig appConfig;
 
@@ -36,7 +35,7 @@ public class MockCaseApiServiceApplication {
    */
   public static void main(final String[] args) {
 
-    SpringApplication.run(MockCaseApiServiceApplication.class, args);
+    SpringApplication.run(MockAiApplication.class, args);
   }
 
   /**

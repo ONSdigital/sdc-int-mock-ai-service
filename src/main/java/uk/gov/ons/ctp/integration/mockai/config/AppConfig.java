@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.integration.mockcaseapiservice.config;
+package uk.gov.ons.ctp.integration.mockai.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
