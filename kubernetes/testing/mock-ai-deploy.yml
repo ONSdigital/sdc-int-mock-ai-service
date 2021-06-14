@@ -1,9 +1,9 @@
 apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
-  name: mockcaseapi
+  name: mock-ai
   labels:
-    app: mockcaseapi
+    app: mock-ai
 spec:
   replicas: 1
   strategy:
@@ -13,13 +13,13 @@ spec:
     type: RollingUpdate
   template:
     metadata:
-      name: mockcaseapi
+      name: mock-ai
       labels:
-        app: mockcaseapi
+        app: mock-ai
     spec:
       containers:
-      - name: mockcaseapi
-        image: eu.gcr.io/census-gcr-int/census-mock-case-api-service:0.19.0-rc.1
+      - name: mock-ai
+        image: eu.gcr.io/sdc-int-ci/mock-ai:0.19.0-rc.1
         imagePullPolicy: Always
         resources:
           requests:

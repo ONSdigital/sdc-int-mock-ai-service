@@ -8,5 +8,5 @@ export VERSIONTAG=$TRAVIS_BUILD_ID"-"$BRANCH
 
 echo "Building with tags [$VERSIONTAG]"
 
-docker build -t eu.gcr.io/sdc-int-ci/sdc-int-mock-ai-service:$VERSIONTAG .
-docker push eu.gcr.io/sdc-int-ci/sdc-int-mock-ai-service:$VERSIONTAG
+docker build -t eu.gcr.io/sdc-int-ci/mock-ai:$VERSIONTAG .
+docker push eu.gcr.io/sdc-int-ci/mock-ai:$VERSIONTAG

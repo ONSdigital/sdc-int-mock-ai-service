@@ -4,7 +4,7 @@
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>ons.sdc.int.app</groupId>
-  <artifactId>sdc-int-mock-ai-service</artifactId>
+  <artifactId>mock-ai</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
