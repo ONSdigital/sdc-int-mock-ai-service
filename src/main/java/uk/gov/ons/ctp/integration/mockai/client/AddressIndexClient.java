@@ -25,20 +25,17 @@ public class AddressIndexClient {
   public AddressIndexClient(RestClient restClient, String aiToken) throws CTPException {
     this.restClient = restClient;
     this.aiToken = aiToken.trim();
-
-    // Fail if the AI security token has not been set
-    if (this.aiToken.isEmpty()) {
-      log.with("TokenName", "AI_TOKEN").error("Address Index token not set. Unable to contact AI.");
-      throw new CTPException(Fault.RESOURCE_NOT_FOUND, "AI token not set: " + "AI_TOKEN");
-    }
   }
 
-  /** Get AI address data by postcode. RH version. */
-  public String getAddressesRhPostcode(String postcode) {
+  /** 
+   * Get AI address data by postcode. RH version. 
+   * @throws CTPException 
+   */
+  public String getAddressesRhPostcode(String postcode) throws CTPException {
     return invokeAI(RequestType.AI_RH_POSTCODE.getUrl(), null, postcode);
   }
 
-  public String getAddressesPartial(String input) {
+  public String getAddressesPartial(String input) throws CTPException {
 
     MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
     queryParams.add("input", input);
@@ -47,16 +44,22 @@ public class AddressIndexClient {
     return response;
   }
 
-  public String getAddressesPostcode(String postcode) {
+  public String getAddressesPostcode(String postcode) throws CTPException {
     return invokeAI(RequestType.AI_POSTCODE.getUrl(), null, postcode);
   }
 
-  public String getAddressesRhUprn(String uprn) {
+  public String getAddressesRhUprn(String uprn) throws CTPException {
     return invokeAI(RequestType.AI_RH_UPRN.getUrl(), null, uprn);
   }
 
   private String invokeAI(
-      String path, MultiValueMap<String, String> queryParams, String... pathParams) {
+      String path, MultiValueMap<String, String> queryParams, String... pathParams) throws CTPException {
+
+    // Fail if the AI security token has not been set
+    if (this.aiToken.isEmpty()) {
+      log.with("TokenName", "AI_TOKEN").error("Address Index token not set. Unable to contact AI.");
+      throw new CTPException(Fault.RESOURCE_NOT_FOUND, "AI token not set: " + "AI_TOKEN");
+    }
 
     if (queryParams == null) {
       queryParams = new LinkedMultiValueMap<String, String>();
@@ -65,9 +68,8 @@ public class AddressIndexClient {
     Map<String, String> headerParams = new HashMap<String, String>();
     headerParams.put("Authorization: ", "Bearer " + aiToken);
 
-    String response =
-        restClient.getResource(
-            path, String.class, headerParams, queryParams, (Object[]) pathParams);
+    String response = restClient.getResource(path, String.class, headerParams, queryParams, 
+        (Object[]) pathParams);
 
     return response;
   }
