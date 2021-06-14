@@ -27,9 +27,10 @@ public class AddressIndexClient {
     this.aiToken = aiToken.trim();
   }
 
-  /** 
-   * Get AI address data by postcode. RH version. 
-   * @throws CTPException 
+  /**
+   * Get AI address data by postcode. RH version.
+   *
+   * @throws CTPException
    */
   public String getAddressesRhPostcode(String postcode) throws CTPException {
     return invokeAI(RequestType.AI_RH_POSTCODE.getUrl(), null, postcode);
@@ -53,7 +54,8 @@ public class AddressIndexClient {
   }
 
   private String invokeAI(
-      String path, MultiValueMap<String, String> queryParams, String... pathParams) throws CTPException {
+      String path, MultiValueMap<String, String> queryParams, String... pathParams)
+      throws CTPException {
 
     // Fail if the AI security token has not been set
     if (this.aiToken.isEmpty()) {
@@ -68,8 +70,9 @@ public class AddressIndexClient {
     Map<String, String> headerParams = new HashMap<String, String>();
     headerParams.put("Authorization: ", "Bearer " + aiToken);
 
-    String response = restClient.getResource(path, String.class, headerParams, queryParams, 
-        (Object[]) pathParams);
+    String response =
+        restClient.getResource(
+            path, String.class, headerParams, queryParams, (Object[]) pathParams);
 
     return response;
   }
