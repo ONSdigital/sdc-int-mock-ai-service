@@ -36,7 +36,7 @@ management:
       enabled: true
 
 server:
-  port: 8161
+  port: 8162
   undertow:
     threads:
       worker: 50

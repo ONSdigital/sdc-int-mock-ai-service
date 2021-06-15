@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: mock-ai
-        image: eu.gcr.io/sdc-int-ci/mock-ai:228899886-CR20-Implement_initial_AI_mock
+        image: eu.gcr.io/sdc-int-ci/mock-ai:228916813-CR20-Implement_initial_AI_mock
         imagePullPolicy: Always
         resources:
           requests:
