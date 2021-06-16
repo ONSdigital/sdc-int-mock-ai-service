@@ -1,7 +1,5 @@
 package uk.gov.ons.ctp.integration.mockai.endpoint;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,15 +8,22 @@ import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+
 import javax.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.godaddy.logging.Logger;
+import com.godaddy.logging.LoggerFactory;
+
 import uk.gov.ons.ctp.common.endpoint.CTPEndpoint;
 import uk.gov.ons.ctp.common.error.CTPException;
+import uk.gov.ons.ctp.integration.mockai.misc.Constants;
 import uk.gov.ons.ctp.integration.mockai.model.AddressesRhPostcodeRequestDTO;
 
 /** Provides mock endpoints for a subset of the AI /addresses endpoints. */
@@ -105,7 +110,7 @@ public final class AddressesEndpoint implements CTPEndpoint {
     String response = readCapturedAiResponse(requestType, baseFileName);
 
     if (response == null) {
-      response = readCapturedAiResponse(requestType, "notFound");
+      response = readCapturedAiResponse(requestType, Constants.NO_DATA_FILE_NAME);
 
       // Replace any place holders with actual values
       String placeholderName = requestType.getPlaceholderName();
