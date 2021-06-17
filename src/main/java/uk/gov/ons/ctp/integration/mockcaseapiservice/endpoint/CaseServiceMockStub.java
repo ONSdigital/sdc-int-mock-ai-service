@@ -56,7 +56,7 @@ public final class CaseServiceMockStub implements CTPEndpoint {
 
   @RequestMapping(value = "/info", method = RequestMethod.GET)
   public ResponseEntity<String> info() {
-    return ResponseEntity.ok("CENSUS MOCK CASE SERVICE");
+    return ResponseEntity.ok("SDC MOCK CASE SERVICE");
   }
 
   @RequestMapping(value = "/examples", method = RequestMethod.GET)
