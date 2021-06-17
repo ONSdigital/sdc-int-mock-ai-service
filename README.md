@@ -2,23 +2,7 @@
 # Mock AI
 This repository is a test service and can be run instead of the an Address Index service.
 
-
 ## Running
-
-There are two ways of running this service
-
-* The first way is from the command line after moving into the same directory as the pom.xml:
-    ```bash
-    mvn clean install
-    mvn spring-boot:run
-    ```
-* The second way requires that you first create a JAR file using the following mvn command (after moving into the same directory as the pom.xml):
-    ```bash
-    mvn clean package
-    ```
-This will create the JAR file in the Target directory. You can then right-click on the JAR file (in Intellij) and choose 'Run'.
-
-## End Point
 
 When running successfully version information can be obtained from the info endpoint
     
@@ -62,4 +46,3 @@ return the captured data.
     
 ## Copyright
 Copyright (C) 2021 Crown Copyright (Office for National Statistics)
-
