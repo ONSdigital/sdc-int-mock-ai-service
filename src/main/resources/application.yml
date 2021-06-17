@@ -36,7 +36,7 @@ management:
       enabled: true
 
 server:
-  port: 8161
+  port: 8162
   undertow:
     threads:
       worker: 50
@@ -46,7 +46,6 @@ spring:
   mvc:
     servlet:
       path: /
-
   #  security:
   #    user:
   #      name: serco_cks
@@ -55,5 +54,16 @@ spring:
     ansi:
       enabled: never
   application:
-    name: ONS CensusMockCaseApiService
+    name: MockAI
 
+address-index:
+  token: 
+  rest-client-config:
+    scheme: https
+    host: whitelodge-eq-ai-api.census-gcp.onsdigital.uk
+    port: 443
+    connection-manager-default-max-per-route: 100
+    connection-manager-max-total: 100
+    connectTimeoutMillis: 0
+    connectionRequestTimeoutMillis: 0
+    socketTimeoutMillis: 0

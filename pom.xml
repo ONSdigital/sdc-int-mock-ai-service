@@ -312,7 +312,7 @@
         <artifactId>spring-boot-maven-plugin</artifactId>
         <configuration>
           <executable>true</executable>
-          <mainClass>uk.gov.ons.ctp.integration.mockcaseapiservice.MockCaseApiServiceApplication</mainClass>
+          <mainClass>uk.gov.ons.ctp.integration.mockai.MockAiApplication</mainClass>
         </configuration>
         <executions>
           <execution>

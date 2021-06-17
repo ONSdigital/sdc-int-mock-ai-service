@@ -5,7 +5,7 @@ metadata:
   labels:
     app: mock-ai
 spec:
-  replicas: 1
+  replicas: [REPLICAS]
   selector:
     matchLabels:
       app: mock-ai
@@ -22,15 +22,15 @@ spec:
     spec:
       containers:
       - name: mock-ai
-        image: eu.gcr.io/sdc-int-ci/mock-ai:228916813-CR20-Implement_initial_AI_mock
+        image: eu.gcr.io/[GCR]/mock-ai:[CONTAINER_VERSION]
         imagePullPolicy: Always
         resources:
           requests:
-            cpu: "0.1"
-            memory: "512Mi"
+            cpu: "[CPU_REQ]"
+            memory: "[MEM_REQ]"
           limits:
-            cpu: "0.5M"
-            memory: "1024Mi"
+            cpu: "[CPU_MAX]"
+            memory: "[MEM_MAX]"
         readinessProbe:
           httpGet:
             path: /info
@@ -53,7 +53,7 @@ spec:
         env:
         - name: JAVA_TOOL_OPTIONS
           value: "-Dlogging.useJson=true
-            -Dspring.profiles.active=dev
+            -Dspring.profiles.active=[ENV]
             -Dlogging.level.uk.gov.ons.ctp=DEBUG
             -Dlogging.level.org.springframework=WARN
             -Dendpoints.autoconfig.enabled=false
