@@ -5,15 +5,15 @@ import java.util.ArrayList;
 import lombok.Data;
 
 @Data
-public class AddressIndexSearchResultsDTO {
+public class AddressIndexPostcodeResultsDTO {
   
   private String apiVersion;
 
   private String dataVersion;
 
-  private AddressIndexResponseCompositeDTO response;
+  private AddressIndexPostcodeResponseDTO response;
 
-  private ResponseStatusData status;
+  private AddressIndexStatusDTO status;
 
   private ArrayList<String> errors;
 }

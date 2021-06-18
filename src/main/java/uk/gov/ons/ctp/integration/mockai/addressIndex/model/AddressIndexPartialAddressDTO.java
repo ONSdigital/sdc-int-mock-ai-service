@@ -1,12 +1,9 @@
 package uk.gov.ons.ctp.integration.mockai.addressIndex.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
-/** Address Index query result splitting address into Census component fields */
 @Data
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class AddressIndexAddressCompositeDTO {
+public class AddressIndexPartialAddressDTO {
 
   private String uprn;
 
@@ -25,6 +22,8 @@ public class AddressIndexAddressCompositeDTO {
   private String welshFormattedAddressPaf;
   
   private String formattedAddressAuxiliary;
+  
+  private AddressIndexHighlights highlights;
   
   private AddressIndexGeo geo;
   

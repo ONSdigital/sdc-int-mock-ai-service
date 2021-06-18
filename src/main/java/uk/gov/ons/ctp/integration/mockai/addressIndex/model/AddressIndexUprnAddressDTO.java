@@ -1,11 +1,9 @@
 package uk.gov.ons.ctp.integration.mockai.addressIndex.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 @Data
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class AddressIndexAddressDTO {
+public class AddressIndexUprnAddressDTO {
 
   private String uprn;
   
@@ -25,7 +23,7 @@ public class AddressIndexAddressDTO {
 
   private String censusAddressType;
 
-  private String censusEstabType; // Holds value of EstabType.code
+  private String censusEstabType;
 
   private String countryCode;
 

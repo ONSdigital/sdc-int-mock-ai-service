@@ -2,17 +2,14 @@ package uk.gov.ons.ctp.integration.mockai.addressIndex.model;
 
 import java.util.ArrayList;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import lombok.Data;
 
 @Data
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class AddressIndexResponseCompositeDTO {
+public class AddressIndexPostcodeResponseDTO {
 
   private String postcode;
   
-  private ArrayList<AddressIndexAddressCompositeDTO> addresses;
+  private ArrayList<AddressIndexPostcodeAddressDTO> addresses;
   
   private String filter;
   

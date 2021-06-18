@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.Data;
 
+/**
+ * This class holds data for the 'census' level of address data.
+ */
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AddressIndexAddressCensusDTO {
