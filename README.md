@@ -1,4 +1,3 @@
-
 # Mock AI
 This repository is a test service and can be run instead of the an Address Index service.
 
