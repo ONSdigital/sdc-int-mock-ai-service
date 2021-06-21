@@ -12,7 +12,7 @@
     <groupId>ons.sdc.int.common</groupId>
     <artifactId>common</artifactId>
     <!-- change this to the version of ALL common libs to be used by this build -->
-    <version>1.0.4</version>
+    <version>1.0.7</version>
   </parent>
 
   <name>SDC : Integrations Mock AI Service</name>
@@ -24,9 +24,8 @@
   </properties>
 
   <scm>
-    <connection>scm:git:https://github.com/ONSdigital/sdc-int-mock-ai-service</connection>
-    <developerConnection>scm:git:https://github.com/ONSdigital/sdc-int-mock-ai-service</developerConnection>
-    <url>https://github.com/ONSdigital/sdc-int-mock-ai-service</url>
+    <connection>scm:git:ssh://github.com/ONSdigital/sdc-int-mock-ai-service</connection>
+    <developerConnection>scm:git:ssh://github.com/ONSdigital/sdc-int-mock-ai-service</developerConnection>
     <tag>HEAD</tag>
   </scm>
 
@@ -72,6 +71,14 @@
 
   <dependencies>
     <!-- Spring dependencies -->
+
+    <extensions>
+      <extension>
+        <groupId>com.google.cloud.artifactregistry</groupId>
+        <artifactId>artifactregistry-maven-wagon</artifactId>
+        <version>2.1.1</version>
+      </extension>
+    </extensions>
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -449,4 +456,38 @@
       </resource>
     </resources>
   </build>
+
+  <repositories>
+    <repository>
+      <id>artifact-release-registry</id>
+      <url>artifactregistry://europe-west2-maven.pkg.dev/ons-ci-int/int-maven-release</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>artifact-snapshot-registry</id>
+      <url>artifactregistry://europe-west2-maven.pkg.dev/ons-ci-int/int-maven-snapshot</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>artifact-snapshot-registry</id>
+      <url>artifactregistry://europe-west2-maven.pkg.dev/ons-ci-int/int-maven-snapshot</url>
+    </snapshotRepository>
+    <repository>
+      <id>artifact-release-registry</id>
+      <url>artifactregistry://europe-west2-maven.pkg.dev/ons-ci-int/int-maven-release</url>
+    </repository>
+  </distributionManagement>
 </project>
