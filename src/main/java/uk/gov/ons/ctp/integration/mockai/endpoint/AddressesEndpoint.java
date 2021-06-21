@@ -1,5 +1,8 @@
 package uk.gov.ons.ctp.integration.mockai.endpoint;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.godaddy.logging.Logger;
+import com.godaddy.logging.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,9 +11,7 @@ import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-
 import javax.validation.Valid;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,11 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
-
 import uk.gov.ons.ctp.common.endpoint.CTPEndpoint;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.integration.mockai.misc.Constants;
@@ -114,12 +110,9 @@ public final class AddressesEndpoint implements CTPEndpoint {
     String responseText = readCapturedAiResponse(requestType, baseFileName);
 
     if (responseText != null) {
-      Object bean = new ObjectMapper()
-         .readerFor(requestType.getResponseClass())
-         .readValue(responseText);
-
-      response = bean;
-//      System.out.println("PMB: " + bean.getResponse().getAddresses().get(0).getUprn());
+      // Convert captured AI response to an object
+      response =
+          new ObjectMapper().readerFor(requestType.getResponseClass()).readValue(responseText);
     } else {
       // 404 - not found
       responseStatus = HttpStatus.NOT_FOUND;
@@ -131,7 +124,7 @@ public final class AddressesEndpoint implements CTPEndpoint {
         String fullPlaceholderName = "%" + placeholderName + "%";
         responseText = responseText.replace(fullPlaceholderName, baseFileName);
       }
-      
+
       response = responseText;
     }
 

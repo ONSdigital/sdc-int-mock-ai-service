@@ -6,9 +6,9 @@ import lombok.Data;
 public class AddressIndexUprnAddressDTO {
 
   private String uprn;
-  
+
   private String formattedAddress;
-  
+
   private String addressLine1;
 
   private String addressLine2;

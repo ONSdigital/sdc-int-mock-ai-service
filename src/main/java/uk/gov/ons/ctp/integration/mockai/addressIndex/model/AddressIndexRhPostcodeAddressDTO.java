@@ -7,16 +7,16 @@ import lombok.Data;
 public class AddressIndexRhPostcodeAddressDTO {
 
   private String uprn;
-  
+
   private String formattedAddress;
-  
+
   private String addressType;
-  
+
   private String censusAddressType;
-  
+
   private String censusEstabType;
-  
+
   private String countryCode;
-  
+
   private long confidenceScore;
 }
