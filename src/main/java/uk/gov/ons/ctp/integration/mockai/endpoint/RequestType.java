@@ -1,10 +1,10 @@
 package uk.gov.ons.ctp.integration.mockai.endpoint;
 
 import lombok.Getter;
-import uk.gov.ons.ctp.integration.mockai.addressIndex.model.AddressIndexPartialResultsDTO;
-import uk.gov.ons.ctp.integration.mockai.addressIndex.model.AddressIndexPostcodeResultsDTO;
-import uk.gov.ons.ctp.integration.mockai.addressIndex.model.AddressIndexRhPostcodeResultsDTO;
-import uk.gov.ons.ctp.integration.mockai.addressIndex.model.AddressIndexUprnResultDTO;
+import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexPartialResultsDTO;
+import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexPostcodeResultsDTO;
+import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexRhPostcodeResultsDTO;
+import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexUprnResultDTO;
 
 @Getter
 public enum RequestType {

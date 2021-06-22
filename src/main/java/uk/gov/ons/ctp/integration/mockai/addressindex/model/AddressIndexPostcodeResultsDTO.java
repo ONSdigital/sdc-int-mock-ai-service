@@ -1,16 +1,16 @@
-package uk.gov.ons.ctp.integration.mockai.addressIndex.model;
+package uk.gov.ons.ctp.integration.mockai.addressindex.model;
 
 import java.util.ArrayList;
 import lombok.Data;
 
 @Data
-public class AddressIndexPartialResultsDTO {
+public class AddressIndexPostcodeResultsDTO {
 
   private String apiVersion;
 
   private String dataVersion;
 
-  private AddressIndexPartialResponseDTO response;
+  private AddressIndexPostcodeResponseDTO response;
 
   private AddressIndexStatusDTO status;
 

@@ -1,10 +1,9 @@
-package uk.gov.ons.ctp.integration.mockai.addressIndex.model;
+package uk.gov.ons.ctp.integration.mockai.addressindex.model;
 
 import lombok.Data;
 
-/** Address Index query result splitting address into Census component fields */
 @Data
-public class AddressIndexPostcodeAddressDTO {
+public class AddressIndexPartialAddressDTO {
 
   private String uprn;
 
@@ -23,6 +22,8 @@ public class AddressIndexPostcodeAddressDTO {
   private String welshFormattedAddressPaf;
 
   private String formattedAddressAuxiliary;
+
+  private AddressIndexHighlights highlights;
 
   private AddressIndexGeo geo;
 

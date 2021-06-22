@@ -10,12 +10,12 @@ import org.springframework.util.MultiValueMap;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.CTPException.Fault;
 import uk.gov.ons.ctp.common.rest.RestClient;
-import uk.gov.ons.ctp.integration.mockai.addressIndex.model.AddressIndexPartialAddressDTO;
-import uk.gov.ons.ctp.integration.mockai.addressIndex.model.AddressIndexPartialResultsDTO;
-import uk.gov.ons.ctp.integration.mockai.addressIndex.model.AddressIndexPostcodeAddressDTO;
-import uk.gov.ons.ctp.integration.mockai.addressIndex.model.AddressIndexPostcodeResultsDTO;
-import uk.gov.ons.ctp.integration.mockai.addressIndex.model.AddressIndexRhPostcodeAddressDTO;
-import uk.gov.ons.ctp.integration.mockai.addressIndex.model.AddressIndexRhPostcodeResultsDTO;
+import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexPartialAddressDTO;
+import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexPartialResultsDTO;
+import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexPostcodeAddressDTO;
+import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexPostcodeResultsDTO;
+import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexRhPostcodeAddressDTO;
+import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexRhPostcodeResultsDTO;
 import uk.gov.ons.ctp.integration.mockai.endpoint.RequestType;
 import uk.gov.ons.ctp.integration.mockai.misc.Constants;
 

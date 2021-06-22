@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.integration.mockai.addressIndex.model;
+package uk.gov.ons.ctp.integration.mockai.addressindex.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;

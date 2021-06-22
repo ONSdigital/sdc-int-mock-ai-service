@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.integration.mockai.addressIndex.model;
+package uk.gov.ons.ctp.integration.mockai.addressindex.model;
 
 import lombok.Data;
 
