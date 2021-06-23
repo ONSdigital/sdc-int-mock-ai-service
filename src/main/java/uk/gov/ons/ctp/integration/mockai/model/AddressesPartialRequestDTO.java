@@ -13,7 +13,7 @@ public class AddressesPartialRequestDTO {
 
   private int offset = 0;
 
-  private int limit = 100;
+  private int limit = 20;
 
   private String classificationfilter;
 

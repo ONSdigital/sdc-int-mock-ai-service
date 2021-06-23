@@ -1,6 +1,6 @@
 package uk.gov.ons.ctp.integration.mockai.addressindex.model;
 
-import java.util.ArrayList;
+import java.util.List;
 import lombok.Data;
 
 @Data
@@ -8,7 +8,7 @@ public class AddressIndexPostcodeResponseDTO {
 
   private String postcode;
 
-  private ArrayList<AddressIndexPostcodeAddressDTO> addresses;
+  private List<AddressIndexPostcodeAddressDTO> addresses;
 
   private String filter;
 
