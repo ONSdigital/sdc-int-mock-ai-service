@@ -1,7 +1,10 @@
 #!/bin/bash
 
-# This script 
-
+# This script updates all of the captured data held in /src/main/resources/data
+#
+# To run it the mock-ai needs to have access to the security token used by AI.
+# mock-ai therefore needs to have a value set for 'address-index.token'.
+# Note that mock-ai is assumed to be running locally.
 
 set -e
 
@@ -20,11 +23,12 @@ sed -i ".bak" 's|/partial/|/partial?input=|g' $TMP_FILE
 sed -i ".bak" 's|^.|curl -s localhost:8162/capture|g' $TMP_FILE
 sed -i ".bak" 's|.json$||g' $TMP_FILE
 
-# Invoke capture endpoint to refresh existing data
+# Invoke capture endpoint to refresh each existing data file
 cat $TMP_FILE | while read line 
 do
   echo "Refreshing: $line"
   
+  # Execute the curl command
   $line > /tmp/refreshCapture.result.json
   if [ $? -ne 0 ]
   then
