@@ -26,7 +26,6 @@ management:
     info:
       enabled: true 
     health:
-      enabled: true
 
 server:
   port: 8162
