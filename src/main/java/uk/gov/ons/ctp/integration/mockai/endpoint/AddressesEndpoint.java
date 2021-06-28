@@ -1,5 +1,6 @@
 package uk.gov.ons.ctp.integration.mockai.endpoint;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.godaddy.logging.Logger;
 import com.godaddy.logging.LoggerFactory;
 import java.io.BufferedReader;
@@ -10,6 +11,8 @@ import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +23,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.ons.ctp.common.endpoint.CTPEndpoint;
 import uk.gov.ons.ctp.common.error.CTPException;
+import uk.gov.ons.ctp.common.error.CTPException.Fault;
+import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexPartialAddressDTO;
+import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexPartialResultsDTO;
+import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexPostcodeAddressDTO;
+import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexPostcodeResultsDTO;
+import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexRhPostcodeAddressDTO;
+import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexRhPostcodeResultsDTO;
 import uk.gov.ons.ctp.integration.mockai.misc.Constants;
+import uk.gov.ons.ctp.integration.mockai.model.AddressesPartialRequestDTO;
+import uk.gov.ons.ctp.integration.mockai.model.AddressesPostcodeRequestDTO;
 import uk.gov.ons.ctp.integration.mockai.model.AddressesRhPostcodeRequestDTO;
+import uk.gov.ons.ctp.integration.mockai.model.AddressesRhUprnRequestDTO;
 
 /** Provides mock endpoints for a subset of the AI /addresses endpoints. */
 @RestController
@@ -49,7 +62,7 @@ public final class AddressesEndpoint implements CTPEndpoint {
   }
 
   @RequestMapping(value = "/addresses/rh/postcode/{postcode}", method = RequestMethod.GET)
-  public ResponseEntity<String> getAddressesRhPostcode(
+  public ResponseEntity<Object> getAddressesRhPostcode(
       @PathVariable(value = "postcode") String postcode,
       @Valid AddressesRhPostcodeRequestDTO requestParamsDTO)
       throws IOException, CTPException {
@@ -58,56 +71,116 @@ public final class AddressesEndpoint implements CTPEndpoint {
     log.with("postcode", postcode).info("Request " + requestType.getPath() + "/" + postcode);
 
     postcode = postcode.replaceAll(" ", "").trim();
-    ResponseEntity<String> response = simulateAIResponse(requestType, postcode);
+    ResponseEntity<Object> response =
+        simulateAIResponse(
+            requestType, postcode, requestParamsDTO.getOffset(), requestParamsDTO.getLimit());
 
     return response;
   }
 
   @RequestMapping(value = "/addresses/partial", method = RequestMethod.GET)
-  public ResponseEntity<String> getAddressesPartial(@RequestParam(required = true) String input)
+  public ResponseEntity<Object> getAddressesPartial(
+      @RequestParam(required = true) String input,
+      @Valid AddressesPartialRequestDTO requestParamsDTO)
       throws IOException, CTPException {
     RequestType requestType = RequestType.AI_PARTIAL;
 
     log.with("input", input).info("Request " + requestType.getPath());
 
     String cleanedInput = input.replaceAll(" ", "-").trim();
-    ResponseEntity<String> response = simulateAIResponse(requestType, cleanedInput);
+    ResponseEntity<Object> response =
+        simulateAIResponse(
+            requestType, cleanedInput, requestParamsDTO.getOffset(), requestParamsDTO.getLimit());
 
     return response;
   }
 
   @RequestMapping(value = "/addresses/postcode/{postcode}", method = RequestMethod.GET)
-  public ResponseEntity<String> getAddressesPostcode(
-      @PathVariable(value = "postcode") String postcode) throws IOException, CTPException {
+  public ResponseEntity<Object> getAddressesPostcode(
+      @PathVariable(value = "postcode") String postcode,
+      @Valid AddressesPostcodeRequestDTO requestParamsDTO)
+      throws IOException, CTPException {
     RequestType requestType = RequestType.AI_POSTCODE;
 
     log.with("postcode", postcode).info("Request " + requestType.getPath() + "/" + postcode);
 
     postcode = postcode.replaceAll(" ", "").trim();
-    ResponseEntity<String> response = simulateAIResponse(requestType, postcode);
+    ResponseEntity<Object> response =
+        simulateAIResponse(
+            requestType, postcode, requestParamsDTO.getOffset(), requestParamsDTO.getLimit());
 
     return response;
   }
 
   @RequestMapping(value = "/addresses/rh/uprn/{uprn}", method = RequestMethod.GET)
-  public ResponseEntity<String> getRhPostcode(@PathVariable(value = "uprn") String uprn)
+  public ResponseEntity<Object> getAddressesRhUprn(
+      @PathVariable(value = "uprn") String uprn, @Valid AddressesRhUprnRequestDTO requestParamsDTO)
       throws IOException, CTPException {
     RequestType requestType = RequestType.AI_RH_UPRN;
 
     log.with("uprn", uprn).info("Request " + requestType.getPath() + "/" + uprn);
 
     uprn = uprn.replaceAll(" ", "").trim();
-    ResponseEntity<String> response = simulateAIResponse(requestType, uprn);
+    ResponseEntity<Object> response = simulateAIResponse(requestType, uprn, 0, 1);
 
     return response;
   }
 
-  private ResponseEntity<String> simulateAIResponse(RequestType requestType, String baseFileName)
+  @SuppressWarnings("unchecked")
+  private ResponseEntity<Object> simulateAIResponse(
+      RequestType requestType, String baseFileName, int offset, int limit)
       throws IOException, CTPException {
     HttpStatus responseStatus = HttpStatus.OK;
+    Object response = null;
     String responseText = readCapturedAiResponse(requestType, baseFileName);
 
-    if (responseText == null) {
+    if (responseText != null) {
+      // Convert captured AI response to an object, and return the target subset of data
+      response =
+          new ObjectMapper().readerFor(requestType.getResponseClass()).readValue(responseText);
+
+      switch (requestType) {
+        case AI_RH_POSTCODE:
+          AddressIndexRhPostcodeResultsDTO rhPostcodes =
+              (AddressIndexRhPostcodeResultsDTO) response;
+          List<AddressIndexRhPostcodeAddressDTO> rhPostcodeAddresses =
+              (List<AddressIndexRhPostcodeAddressDTO>)
+                  subset(rhPostcodes.getResponse().getAddresses(), offset, limit);
+          rhPostcodes.getResponse().setAddresses(rhPostcodeAddresses);
+          rhPostcodes.getResponse().setOffset(offset);
+          rhPostcodes.getResponse().setLimit(limit);
+          // Replicate the counting down of the confidence score
+          int confidence = 100000 + rhPostcodeAddresses.size();
+          for (AddressIndexRhPostcodeAddressDTO address : rhPostcodeAddresses) {
+            address.setConfidenceScore(confidence--);
+          }
+          break;
+        case AI_PARTIAL:
+          AddressIndexPartialResultsDTO partial = (AddressIndexPartialResultsDTO) response;
+          List<AddressIndexPartialAddressDTO> partialAddresses =
+              (List<AddressIndexPartialAddressDTO>)
+                  subset(partial.getResponse().getAddresses(), offset, limit);
+          partial.getResponse().setAddresses(partialAddresses);
+          partial.getResponse().setOffset(offset);
+          partial.getResponse().setLimit(limit);
+          break;
+        case AI_POSTCODE:
+          AddressIndexPostcodeResultsDTO postcodes = (AddressIndexPostcodeResultsDTO) response;
+          List<AddressIndexPostcodeAddressDTO> postcodeAddresses =
+              (List<AddressIndexPostcodeAddressDTO>)
+                  subset(postcodes.getResponse().getAddresses(), offset, limit);
+          postcodes.getResponse().setAddresses(postcodeAddresses);
+          postcodes.getResponse().setOffset(offset);
+          postcodes.getResponse().setLimit(limit);
+          break;
+        case AI_RH_UPRN:
+          // Nothing to do for uprn results
+          break;
+        default:
+          throw new CTPException(
+              Fault.SYSTEM_ERROR, "Unrecognised request type: " + requestType.name());
+      }
+    } else {
       // 404 - not found
       responseStatus = HttpStatus.NOT_FOUND;
       responseText = readCapturedAiResponse(requestType, Constants.NO_DATA_FILE_NAME);
@@ -118,9 +191,21 @@ public final class AddressesEndpoint implements CTPEndpoint {
         String fullPlaceholderName = "%" + placeholderName + "%";
         responseText = responseText.replace(fullPlaceholderName, baseFileName);
       }
+
+      response = responseText;
     }
 
-    return new ResponseEntity<String>(responseText, responseStatus);
+    return new ResponseEntity<Object>(response, responseStatus);
+  }
+
+  private List<?> subset(List<?> addresses, int offset, int limit) {
+    if (offset > addresses.size() || offset < 0) {
+      return new ArrayList<Object>();
+    }
+
+    int toIndex = Math.min(offset + limit, addresses.size());
+
+    return addresses.subList(offset, toIndex);
   }
 
   private String readCapturedAiResponse(RequestType requestType, String baseFileName)

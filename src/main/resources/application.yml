@@ -27,8 +27,6 @@ management:
       enabled: true 
     health:
       enabled: true
-    flyway:
-      enabled: true
 
 server:
   port: 8162

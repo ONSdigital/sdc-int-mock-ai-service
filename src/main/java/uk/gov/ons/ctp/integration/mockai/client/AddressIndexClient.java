@@ -2,6 +2,7 @@ package uk.gov.ons.ctp.integration.mockai.client;
 
 import com.godaddy.logging.Logger;
 import com.godaddy.logging.LoggerFactory;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.util.LinkedMultiValueMap;
@@ -9,7 +10,14 @@ import org.springframework.util.MultiValueMap;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.CTPException.Fault;
 import uk.gov.ons.ctp.common.rest.RestClient;
+import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexPartialAddressDTO;
+import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexPartialResultsDTO;
+import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexPostcodeAddressDTO;
+import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexPostcodeResultsDTO;
+import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexRhPostcodeAddressDTO;
+import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexRhPostcodeResultsDTO;
 import uk.gov.ons.ctp.integration.mockai.endpoint.RequestType;
+import uk.gov.ons.ctp.integration.mockai.misc.Constants;
 
 /**
  * This class is responsible for talking to Address Index.
@@ -32,29 +40,117 @@ public class AddressIndexClient {
    *
    * @throws CTPException
    */
-  public String getAddressesRhPostcode(String postcode) throws CTPException {
-    return invokeAI(RequestType.AI_RH_POSTCODE.getUrl(), null, postcode);
+  public Object getAddressesRhPostcode(String postcode) throws CTPException {
+    ArrayList<AddressIndexRhPostcodeResultsDTO> results = new ArrayList<>();
+    int offset = 0;
+    int batchSize = 100;
+
+    while (offset < Constants.CAPTURE_MAXIMUM_RESULTS) {
+      AddressIndexRhPostcodeResultsDTO response =
+          (AddressIndexRhPostcodeResultsDTO)
+              invokeAI(RequestType.AI_RH_POSTCODE, null, offset, batchSize, (String) null);
+      results.add(response);
+
+      int numFound = response.getResponse().getAddresses().size();
+      if (numFound == 0) {
+        break;
+      }
+
+      offset += numFound;
+    }
+
+    // Amalgamate all results into single data set
+    ArrayList<AddressIndexRhPostcodeAddressDTO> allResponses = new ArrayList<>();
+    for (AddressIndexRhPostcodeResultsDTO r : results) {
+      allResponses.addAll(r.getResponse().getAddresses());
+    }
+
+    AddressIndexRhPostcodeResultsDTO result = results.get(0);
+    result.getResponse().setAddresses(allResponses);
+    result.getResponse().setLimit(-1);
+
+    return result;
   }
 
-  public String getAddressesPartial(String input) throws CTPException {
+  public AddressIndexPartialResultsDTO getAddressesPartial(String input) throws CTPException {
+    ArrayList<AddressIndexPartialResultsDTO> results = new ArrayList<>();
+    int offset = 0;
+    int batchSize = 100;
 
-    MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
-    queryParams.add("input", input);
+    while (offset < Constants.CAPTURE_MAXIMUM_RESULTS) {
+      MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
+      queryParams.add("input", input);
 
-    String response = invokeAI(RequestType.AI_PARTIAL.getUrl(), queryParams, (String) null);
-    return response;
+      AddressIndexPartialResultsDTO response =
+          (AddressIndexPartialResultsDTO)
+              invokeAI(RequestType.AI_PARTIAL, queryParams, offset, batchSize, (String) null);
+      results.add(response);
+
+      int numFound = response.getResponse().getAddresses().size();
+      if (numFound == 0) {
+        break;
+      }
+
+      offset += numFound;
+    }
+
+    // Amalgamate all results into single data set
+    ArrayList<AddressIndexPartialAddressDTO> allResponses = new ArrayList<>();
+    for (AddressIndexPartialResultsDTO r : results) {
+      allResponses.addAll(r.getResponse().getAddresses());
+    }
+
+    AddressIndexPartialResultsDTO result = results.get(0);
+    result.getResponse().setAddresses(allResponses);
+    result.getResponse().setLimit(-1);
+
+    return result;
   }
 
-  public String getAddressesPostcode(String postcode) throws CTPException {
-    return invokeAI(RequestType.AI_POSTCODE.getUrl(), null, postcode);
+  public AddressIndexPostcodeResultsDTO getAddressesPostcode(String postcode) throws CTPException {
+    ArrayList<AddressIndexPostcodeResultsDTO> results = new ArrayList<>();
+    int offset = 0;
+    int batchSize = 100;
+
+    while (offset < Constants.CAPTURE_MAXIMUM_RESULTS) {
+      AddressIndexPostcodeResultsDTO response =
+          (AddressIndexPostcodeResultsDTO)
+              invokeAI(RequestType.AI_POSTCODE, null, offset, batchSize, postcode);
+      results.add(response);
+
+      int numFound = response.getResponse().getAddresses().size();
+      if (numFound == 0) {
+        break;
+      }
+
+      offset += numFound;
+    }
+
+    // Amalgamate all results into single data set
+    ArrayList<AddressIndexPostcodeAddressDTO> allResponses = new ArrayList<>();
+    for (AddressIndexPostcodeResultsDTO r : results) {
+      allResponses.addAll(r.getResponse().getAddresses());
+    }
+
+    AddressIndexPostcodeResultsDTO result = results.get(0);
+    result.getResponse().setAddresses(allResponses);
+    result.getResponse().setLimit(-1);
+
+    return result;
   }
 
-  public String getAddressesRhUprn(String uprn) throws CTPException {
-    return invokeAI(RequestType.AI_RH_UPRN.getUrl(), null, uprn);
+  public Object getAddressesRhUprn(String uprn) throws CTPException {
+    int offset = -1;
+    int limit = -1;
+    return invokeAI(RequestType.AI_RH_UPRN, null, offset, limit, uprn);
   }
 
-  private String invokeAI(
-      String path, MultiValueMap<String, String> queryParams, String... pathParams)
+  private Object invokeAI(
+      RequestType requestType,
+      MultiValueMap<String, String> queryParams,
+      int offset,
+      int limit,
+      String... pathParams)
       throws CTPException {
 
     // Fail if the AI security token has not been set
@@ -66,13 +162,19 @@ public class AddressIndexClient {
     if (queryParams == null) {
       queryParams = new LinkedMultiValueMap<String, String>();
     }
+    queryParams.add("offset", Integer.toString(offset));
+    queryParams.add("limit", Integer.toString(limit));
 
     Map<String, String> headerParams = new HashMap<String, String>();
     headerParams.put("Authorization: ", "Bearer " + aiToken);
 
-    String response =
+    Object response =
         restClient.getResource(
-            path, String.class, headerParams, queryParams, (Object[]) pathParams);
+            requestType.getUrl(),
+            requestType.getResponseClass(),
+            headerParams,
+            queryParams,
+            (Object[]) pathParams);
 
     return response;
   }
