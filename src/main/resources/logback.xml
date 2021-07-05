@@ -61,11 +61,7 @@
                 </mdc>
                 <contextMap/>
                 <tags/>
-                <logstashMarkers/>
-                <arguments>
-                    <includeNonStructuredArguments>true</includeNonStructuredArguments>
-                    <nonStructuredArgumentsFieldPrefix>prefix</nonStructuredArgumentsFieldPrefix>
-                </arguments>
+                <arguments/>
             </providers>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
@@ -73,7 +69,7 @@
         </filter>
     </appender>
 
-    <appender class="ch.qos.logback.core.ConsoleAppender" name="DEV">
+    <appender class="ch.qos.logback.core.ConsoleAppender" name="NON_JSON">
         <encoder>
             <pattern>${CONSOLE_LOG_PATTERN}</pattern>
         </encoder>

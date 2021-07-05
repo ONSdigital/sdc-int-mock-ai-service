@@ -1,10 +1,9 @@
 package uk.gov.ons.ctp.integration.mockai;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -21,11 +20,10 @@ import uk.gov.ons.ctp.integration.mockai.client.AddressIndexClient;
 import uk.gov.ons.ctp.integration.mockai.config.AppConfig;
 
 /** The 'main' entry point for the Mock AI SpringBoot Application. */
+@Slf4j
 @SpringBootApplication
 @EnableCaching
 public class MockAiApplication {
-  private static final Logger log = LoggerFactory.getLogger(MockAiApplication.class);
-
   @Autowired private AppConfig appConfig;
 
   /**

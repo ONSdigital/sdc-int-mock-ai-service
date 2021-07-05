@@ -52,8 +52,7 @@ spec:
           containerPort: 8162
         env:
         - name: JAVA_TOOL_OPTIONS
-          value: "-Dlogging.useJson=true
-            -Dspring.profiles.active=dev
+          value: "-Dspring.profiles.active=dev
             -Dlogging.level.uk.gov.ons.ctp=DEBUG
             -Dlogging.level.org.springframework=WARN
             -Dendpoints.autoconfig.enabled=false
