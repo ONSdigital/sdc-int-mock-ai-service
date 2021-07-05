@@ -13,7 +13,6 @@ logging:
     uk.gov.ons.ctp: ERROR
     org.springframework: ERROR
   profile: CLOUD
-  useJson: true
 
 security:
   basic:
