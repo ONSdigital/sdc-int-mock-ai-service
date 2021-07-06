@@ -1,8 +1,9 @@
 package uk.gov.ons.ctp.integration.mockai.endpoint;
 
+import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
+import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.v;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import javax.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,10 +39,10 @@ import uk.gov.ons.ctp.integration.mockai.model.AddressesRhPostcodeRequestDTO;
 import uk.gov.ons.ctp.integration.mockai.model.AddressesRhUprnRequestDTO;
 
 /** Provides mock endpoints for a subset of the AI /addresses endpoints. */
+@Slf4j
 @RestController
 @RequestMapping(value = "", produces = "application/json")
 public final class AddressesEndpoint implements CTPEndpoint {
-  private static final Logger log = LoggerFactory.getLogger(AddressesEndpoint.class);
 
   @RequestMapping(value = "/addresses/info", method = RequestMethod.GET)
   public ResponseEntity<String> info() {
@@ -68,7 +70,7 @@ public final class AddressesEndpoint implements CTPEndpoint {
       throws IOException, CTPException {
     RequestType requestType = RequestType.AI_RH_POSTCODE;
 
-    log.with("postcode", postcode).info("Request " + requestType.getPath() + "/" + postcode);
+    log.info("Request {}/{}", requestType.getPath(), v("postcode", postcode));
 
     postcode = postcode.replaceAll(" ", "").trim();
     ResponseEntity<Object> response =
@@ -85,7 +87,7 @@ public final class AddressesEndpoint implements CTPEndpoint {
       throws IOException, CTPException {
     RequestType requestType = RequestType.AI_PARTIAL;
 
-    log.with("input", input).info("Request " + requestType.getPath());
+    log.info("Request {}", requestType.getPath(), kv("input", input));
 
     String cleanedInput = input.replaceAll(" ", "-").trim();
     ResponseEntity<Object> response =
@@ -102,7 +104,7 @@ public final class AddressesEndpoint implements CTPEndpoint {
       throws IOException, CTPException {
     RequestType requestType = RequestType.AI_POSTCODE;
 
-    log.with("postcode", postcode).info("Request " + requestType.getPath() + "/" + postcode);
+    log.info("Request {}/{}", requestType.getPath(), v("postcode", postcode));
 
     postcode = postcode.replaceAll(" ", "").trim();
     ResponseEntity<Object> response =
@@ -118,7 +120,7 @@ public final class AddressesEndpoint implements CTPEndpoint {
       throws IOException, CTPException {
     RequestType requestType = RequestType.AI_RH_UPRN;
 
-    log.with("uprn", uprn).info("Request " + requestType.getPath() + "/" + uprn);
+    log.info("Request {}/{}", requestType.getPath(), v("uprn", uprn));
 
     uprn = uprn.replaceAll(" ", "").trim();
     ResponseEntity<Object> response = simulateAIResponse(requestType, uprn, 0, 1);
@@ -233,10 +235,11 @@ public final class AddressesEndpoint implements CTPEndpoint {
     // Return nothing if data not held for request
     URL resource = classLoader.getResource(resourceName);
     if (resource == null) {
-      log.with("baseFileName", baseFileName)
-          .with("resource", resourceName)
-          .with("requestType", requestType.name())
-          .info("No captured response");
+      log.info(
+          "No captured response",
+          kv("baseFileName", baseFileName),
+          kv("resource", resourceName),
+          kv("requestType", requestType.name()));
       return null;
     }
 

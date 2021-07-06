@@ -1,10 +1,11 @@
 package uk.gov.ons.ctp.integration.mockai.client;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
+import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import uk.gov.ons.ctp.common.error.CTPException;
@@ -24,9 +25,8 @@ import uk.gov.ons.ctp.integration.mockai.misc.Constants;
  *
  * <p>It's used to capture AI responses that can be used for AI simulation.
  */
+@Slf4j
 public class AddressIndexClient {
-  private static final Logger log = LoggerFactory.getLogger(AddressIndexClient.class);
-
   private RestClient restClient;
   private String aiToken;
 
@@ -164,7 +164,7 @@ public class AddressIndexClient {
 
     // Fail if the AI security token has not been set
     if (this.aiToken.isEmpty()) {
-      log.with("TokenName", "AI_TOKEN").error("Address Index token not set. Unable to contact AI.");
+      log.error("Address Index token not set. Unable to contact AI.", kv("TokenName", "AI_TOKEN"));
       throw new CTPException(Fault.RESOURCE_NOT_FOUND, "AI token not set: " + "AI_TOKEN");
     }
 

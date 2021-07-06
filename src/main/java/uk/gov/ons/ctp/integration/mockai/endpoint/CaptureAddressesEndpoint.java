@@ -1,13 +1,15 @@
 package uk.gov.ons.ctp.integration.mockai.endpoint;
 
+import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
+import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.v;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import javax.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,11 +29,10 @@ import uk.gov.ons.ctp.integration.mockai.model.AddressesRhPostcodeRequestDTO;
  * <p>The set of supported endpoints matches those in AddressesEndpoints, except that these are all
  * prefixed with '/capture'.
  */
+@Slf4j
 @RestController
 @RequestMapping(value = "", produces = "application/json")
 public final class CaptureAddressesEndpoint implements CTPEndpoint {
-  private static final Logger log = LoggerFactory.getLogger(CaptureAddressesEndpoint.class);
-
   @Autowired private AddressIndexClient addressIndexClient;
 
   @RequestMapping(value = "/capture/info", method = RequestMethod.GET)
@@ -61,7 +62,7 @@ public final class CaptureAddressesEndpoint implements CTPEndpoint {
 
     RequestType requestType = RequestType.AI_RH_POSTCODE;
     String postcode = rawPostcode.replaceAll(" ", "").trim();
-    log.with("postcode", rawPostcode).info("Request " + requestType.getPath() + "/" + postcode);
+    log.info("Request {}/{}", requestType.getPath(), v("postcode", rawPostcode));
 
     // Hit AI and save results
     Object result = addressIndexClient.getAddressesRhPostcode(postcode);
@@ -75,7 +76,7 @@ public final class CaptureAddressesEndpoint implements CTPEndpoint {
       throws IOException, CTPException {
 
     RequestType requestType = RequestType.AI_PARTIAL;
-    log.with("input", input).info("Request " + requestType.getUrl());
+    log.info("Request {}", requestType.getUrl(), kv("input", input));
 
     // Hit AI and save results
     Object result = addressIndexClient.getAddressesPartial(input);
@@ -91,7 +92,7 @@ public final class CaptureAddressesEndpoint implements CTPEndpoint {
 
     RequestType requestType = RequestType.AI_POSTCODE;
     String postcode = rawPostcode.replaceAll(" ", "").trim();
-    log.with("postcode", postcode).info("Request " + requestType.getPath() + "/" + rawPostcode);
+    log.info("Request {}/{}", requestType.getPath(), v("postcode", rawPostcode));
 
     // Hit AI and save results
     Object result = addressIndexClient.getAddressesPostcode(postcode);
@@ -106,7 +107,7 @@ public final class CaptureAddressesEndpoint implements CTPEndpoint {
 
     RequestType requestType = RequestType.AI_RH_UPRN;
     uprn = uprn.trim();
-    log.with("uprn", uprn).info("Request " + requestType.getPath() + "/" + uprn);
+    log.info("Request {}/{}", requestType.getPath(), v("uprn", uprn));
 
     // Hit AI and save results
     Object result = addressIndexClient.getAddressesRhUprn(uprn);
@@ -156,11 +157,11 @@ public final class CaptureAddressesEndpoint implements CTPEndpoint {
     // Validate target directory
     if (!dir.exists()) {
       if (failIfNoTargetDir) {
-        log.with("output dir", dir.getAbsolutePath()).error("Output data directory does not exist");
+        log.error("Output data directory does not exist", kv("output dir", dir.getAbsolutePath()));
         throw new CTPException(
             Fault.SYSTEM_ERROR, "Output data directory does not exist: " + dir.getAbsolutePath());
       } else {
-        log.with("output dir", dir.getAbsolutePath()).warn("Output data directory does not exist");
+        log.warn("Output data directory does not exist", kv("output dir", dir.getAbsolutePath()));
         return;
       }
     }
@@ -170,7 +171,7 @@ public final class CaptureAddressesEndpoint implements CTPEndpoint {
 
     // Write AI response json to file
     File outputFile = new File(dir, fileName);
-    log.with("outputFile", outputFile.getAbsoluteFile()).info("Saving AI data to json file");
+    log.info("Saving AI data to json file", kv("outputFile", outputFile.getAbsoluteFile()));
     Files.write(outputFile.toPath(), json.getBytes());
   }
 }
