@@ -115,6 +115,21 @@ public final class CaptureAddressesEndpoint implements CTPEndpoint {
     return result;
   }
 
+  @RequestMapping(value = "/capture/addresses/eq", method = RequestMethod.GET)
+  public Object getAddressesEq(@RequestParam(required = true) String input)
+      throws IOException, CTPException {
+
+    RequestType requestType = RequestType.AI_EQ;
+    log.with("input", input).info("Request " + requestType.getUrl());
+
+    // Hit AI and save results
+    Object result = addressIndexClient.getAddressesEq(input);
+    String cleanedInput = input.replaceAll(" ", "-").trim(); // replace spaces for sensible file name
+    saveAiResponse(requestType, cleanedInput, result);
+
+    return result;
+  }
+
   private void saveAiResponse(RequestType requestType, String baseFileName, Object capturedResponse)
       throws IOException, CTPException {
     // Discover the location of the 'data' resource directory

@@ -139,6 +139,15 @@ public class AddressIndexClient {
     return result;
   }
 
+  public Object getAddressesEq(String input) throws CTPException {
+    MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
+    queryParams.add("input", input);
+
+    String response = (String) invokeAI(RequestType.AI_EQ, queryParams, 0, 10, (String) null);
+
+    return response;
+  }
+
   public Object getAddressesRhUprn(String uprn) throws CTPException {
     int offset = -1;
     int limit = -1;

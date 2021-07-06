@@ -125,6 +125,19 @@ public final class AddressesEndpoint implements CTPEndpoint {
 
     return response;
   }
+  
+  @RequestMapping(value = "/addresses/eq", method = RequestMethod.GET)
+  public ResponseEntity<Object> getAddressesEq(@RequestParam(required = true) String input)
+      throws IOException, CTPException {
+    RequestType requestType = RequestType.AI_EQ;
+
+    log.with("input", input).info("Request " + requestType.getPath());
+
+    String cleanedInput = input.replaceAll(" ", "-").trim();
+    ResponseEntity<Object> response = simulateAIResponse(requestType, cleanedInput, 0, 10);
+
+    return response;
+  }
 
   @SuppressWarnings("unchecked")
   private ResponseEntity<Object> simulateAIResponse(
@@ -172,6 +185,9 @@ public final class AddressesEndpoint implements CTPEndpoint {
           postcodes.getResponse().setAddresses(postcodeAddresses);
           postcodes.getResponse().setOffset(offset);
           postcodes.getResponse().setLimit(limit);
+          break;
+        case AI_EQ:
+          // Nothing to do for type-ahead response
           break;
         case AI_RH_UPRN:
           // Nothing to do for uprn results

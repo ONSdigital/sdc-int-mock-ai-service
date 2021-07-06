@@ -12,7 +12,8 @@ public enum RequestType {
       "/addresses/rh/postcode/{postcode}", "POSTCODE", AddressIndexRhPostcodeResultsDTO.class),
   AI_PARTIAL("/addresses/partial", "INPUT", AddressIndexPartialResultsDTO.class),
   AI_POSTCODE("/addresses/postcode/{postcode}", "POSTCODE", AddressIndexPostcodeResultsDTO.class),
-  AI_RH_UPRN("/addresses/rh/uprn/{uprn}", null, AddressIndexUprnResultDTO.class);
+  AI_RH_UPRN("/addresses/rh/uprn/{uprn}", null, AddressIndexUprnResultDTO.class),
+  AI_EQ("/addresses/eq", "INPUT", String.class);
 
   private String url;
   private String path;
