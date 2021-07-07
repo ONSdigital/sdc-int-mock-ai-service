@@ -143,7 +143,7 @@ public class AddressIndexClient {
     MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
     queryParams.add("input", input);
 
-    String response = (String) invokeAI(RequestType.AI_EQ, queryParams, 0, 10, (String) null);
+    String response = (String) invokeAI(RequestType.AI_EQ, queryParams, 0, 20, (String) null);
 
     return response;
   }
