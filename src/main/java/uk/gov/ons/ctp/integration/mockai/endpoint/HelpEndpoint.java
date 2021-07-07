@@ -29,26 +29,28 @@ public final class HelpEndpoint implements CTPEndpoint {
     helpText.append("\n\n");
     helpText.append("MOCK ENDPOINTS\n");
     helpText.append("  The following endpoints mock a subset of the AI endpoints.\n");
-    helpText.append("  If mock-ai holds data for a request then the response replies with a previously\n");
-    helpText.append("  captured AI response. The mock response should be identical to the genuine AI.\n");
-    helpText.append("  Endpoints which support offset and limit query parameters return a subset of\n");
-    helpText.append("  of the data, although it should be noted that the mock holds only the first 1000\n");
-    helpText.append("  or so results from AI (adjustable with internal mock-ai constant)\n");
+    helpText.append("  If mock-ai holds data for a request then the response replies with a\n");
+    helpText.append("  previously captured AI response. The mock response should be identical \n");
+    helpText.append("  to the genuine AI.\n");
+    helpText.append("  Endpoints which support offset and limit query parameters return a\n");
+    helpText.append("  subset of the data, although it should be noted that the mock holds only\n");
+    helpText.append("  the first 1000 or so results from AI.\n");
     for (RequestType requestType : RequestType.values()) {
       helpText.append("\n");
-      describeUrl(helpText, requestType);
+      describeUrl(helpText, requestType, "");
       describeQueryParams(helpText, requestType);
     }
 
     helpText.append("\n\n");
     helpText.append("CAPTURE ENDPOINTS\n");
     helpText.append("  These allow the dataset used by mock-ai to be extended at run time.\n");
-    helpText.append("  If an endpoint URL is prefixed with '/capture' then the request is initially\n");
-    helpText.append("  sent to AI. The AI response is then written to file, so that a subsequent request\n");
-    helpText.append("  to the corresponding endpoint will respond with the newly capture data.\n");
+    helpText.append("  If an endpoint URL is prefixed with '/capture' then the request is\n");
+    helpText.append("  initially sent to AI. The AI response is then written to file, so\n");
+    helpText.append("  that a subsequent request to the corresponding endpoint will respond\n");
+    helpText.append("  with the newly capture data.\n");
     for (RequestType requestType : RequestType.values()) {
       helpText.append("\n");
-      describeUrl(helpText, requestType);
+      describeUrl(helpText, requestType, "/capture");
       describeQueryParams(helpText, requestType);
     }
 
@@ -57,9 +59,12 @@ public final class HelpEndpoint implements CTPEndpoint {
     helpText.append("\n");
     helpText.append("  Here are some example invocations of the mock-ai\n");
     helpText.append("    $ curl -s localhost:8162/addresses/partial?input=Shirley\n");
-    helpText.append("    $ curl -s localhost:8162/addresses/partial?input=Shirley?offset=625;limit=85\n");
+    helpText.append(
+        "    $ curl -s localhost:8162/addresses/partial?input=Shirley?offset=625;limit=85\n");
     helpText.append("    $ \n");
-    helpText.append("    $ curl -s localhost:8162/capture/addresses/partial?input=Rose%20Cottage\n");
+    helpText.append(
+        "    $ curl -s localhost:8162/capture/addresses/partial?input=Rose%20Cottage\n");
+    helpText.append("    $ curl -s localhost:8162/addresses/partial?input=Rose%20Cottage\n");
 
     helpText.append("\n\n");
     helpText.append("DATA HELD\n");
@@ -77,23 +82,18 @@ public final class HelpEndpoint implements CTPEndpoint {
 
       // List data items held
       for (String name : dataFiles) {
-//        helpText.append("    " + name);
         String normalisedName = dataManager.normaliseFileName(name);
         String dataDescription = props.getProperty(normalisedName, null);
-//        if (props.containsKey(normalisedName)) {
-//          helpText.append("   (" + props.getProperty(normalisedName) + ")");
-//        }
         String dataText = describeData(normalisedName, dataDescription);
         helpText.append("    " + dataText + "\n");
       }
     }
 
-    
     return ResponseEntity.ok(helpText.toString());
   }
 
-  private void describeUrl(StringBuilder helpText, RequestType requestType) {
-    helpText.append("  " + requestType.getUrl() + "\n");
+  private void describeUrl(StringBuilder helpText, RequestType requestType, String urlPrefix) {
+    helpText.append("  " + urlPrefix + requestType.getUrl() + "\n");
     helpText.append("      " + requestType.getDescription() + "\n");
   }
 
@@ -111,8 +111,7 @@ public final class HelpEndpoint implements CTPEndpoint {
     if (dataDescription == null) {
       return normalisedName;
     }
-    
+
     return String.format("%-16s(%s)", normalisedName, dataDescription);
-//    return normalisedName + "(" + dataDescription + ")";
   }
 }
