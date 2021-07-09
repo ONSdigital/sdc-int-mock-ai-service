@@ -1,6 +1,5 @@
 package uk.gov.ons.ctp.integration.mockai.endpoint;
 
-import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
 import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.v;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -63,7 +62,7 @@ public final class AddressesEndpoint implements CTPEndpoint {
       throws IOException, CTPException {
 
     RequestType requestType = RequestType.AI_PARTIAL;
-    log.info("Request {}", requestType.getPath(), kv("input", input));
+    log.info("Request {}", requestType.getPath() + "?input=" + input);
 
     ResponseEntity<Object> response =
         simulateAIResponse(
@@ -106,7 +105,7 @@ public final class AddressesEndpoint implements CTPEndpoint {
       throws IOException, CTPException {
 
     RequestType requestType = RequestType.AI_EQ;
-    log.info("Request {}", requestType.getUrl(), kv("input", input));
+    log.info("Request {}", requestType.getUrl() + "?input=" + input);
 
     ResponseEntity<Object> response = simulateAIResponse(requestType, input, 0, 10);
 

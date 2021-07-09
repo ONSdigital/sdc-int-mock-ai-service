@@ -1,8 +1,7 @@
 package uk.gov.ons.ctp.integration.mockai.endpoint;
 
-import org.springframework.http.HttpStatus;
-
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexPartialResultsDTO;
 import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexPostcodeResultsDTO;
 import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexRhPostcodeResultsDTO;
@@ -41,7 +40,13 @@ public enum RequestType {
       HttpStatus.NOT_FOUND,
       null,
       AddressIndexUprnResultDTO.class),
-  AI_EQ("/addresses/eq", "Search for address for type ahead.", HttpStatus.OK, "INPUT", String.class, "input");
+  AI_EQ(
+      "/addresses/eq",
+      "Search for address for type ahead.",
+      HttpStatus.OK,
+      "INPUT",
+      String.class,
+      "input");
 
   private String url;
   private String description;
