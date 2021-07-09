@@ -175,7 +175,7 @@ public final class AddressesEndpoint implements CTPEndpoint {
       }
     } else {
       // 404 - not found
-      responseStatus = HttpStatus.NOT_FOUND;
+      responseStatus = requestType.getNotFoundHttpStatus();
       responseText = dataManager.readCapturedAiResponse(requestType, Constants.NO_DATA_FILE_NAME);
 
       // Customise the not-found response by replacing any place holders with actual values
