@@ -48,7 +48,7 @@ public class AddressIndexClient {
     while (offset < Constants.CAPTURE_MAXIMUM_RESULTS) {
       AddressIndexRhPostcodeResultsDTO response =
           (AddressIndexRhPostcodeResultsDTO)
-              invokeAI(RequestType.AI_RH_POSTCODE, null, offset, batchSize, (String) null);
+              invokeAI(RequestType.AI_RH_POSTCODE, null, offset, batchSize, postcode);
       results.add(response);
 
       int numFound = response.getResponse().getAddresses().size();
@@ -83,7 +83,7 @@ public class AddressIndexClient {
 
       AddressIndexPartialResultsDTO response =
           (AddressIndexPartialResultsDTO)
-              invokeAI(RequestType.AI_PARTIAL, queryParams, offset, batchSize, (String) null);
+              invokeAI(RequestType.AI_PARTIAL, queryParams, offset, batchSize, input);
       results.add(response);
 
       int numFound = response.getResponse().getAddresses().size();
