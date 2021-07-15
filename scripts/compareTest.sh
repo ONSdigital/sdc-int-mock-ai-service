@@ -74,6 +74,7 @@ compare "addresses/rh/uprn/3244"
 compare "addresses/rh/uprn/100040239948"
 
 # TYPE AHEAD"
+compare "addresses/eq?input=SO1"
 compare "addresses/eq?input=Pineapple"
 
 # Check responses for data with no results in real or mock AI
@@ -82,4 +83,5 @@ compare "addresses/partial?input=rtoeutheuohh"
 compare "addresses/postcode/SO996AB"
 compare "addresses/rh/uprn/11"
 compare "addresses/eq?input=tcexdeupydhp"
+
 # EOF
