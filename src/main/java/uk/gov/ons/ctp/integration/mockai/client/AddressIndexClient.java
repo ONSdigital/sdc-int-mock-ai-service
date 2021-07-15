@@ -48,7 +48,7 @@ public class AddressIndexClient {
     while (offset < Constants.CAPTURE_MAXIMUM_RESULTS) {
       AddressIndexRhPostcodeResultsDTO response =
           (AddressIndexRhPostcodeResultsDTO)
-              invokeAI(RequestType.AI_RH_POSTCODE, null, offset, batchSize, (String) null);
+              invokeAI(RequestType.AI_RH_POSTCODE, null, offset, batchSize, postcode);
       results.add(response);
 
       int numFound = response.getResponse().getAddresses().size();
@@ -83,7 +83,7 @@ public class AddressIndexClient {
 
       AddressIndexPartialResultsDTO response =
           (AddressIndexPartialResultsDTO)
-              invokeAI(RequestType.AI_PARTIAL, queryParams, offset, batchSize, (String) null);
+              invokeAI(RequestType.AI_PARTIAL, queryParams, offset, batchSize, input);
       results.add(response);
 
       int numFound = response.getResponse().getAddresses().size();
@@ -137,6 +137,23 @@ public class AddressIndexClient {
     result.getResponse().setLimit(-1);
 
     return result;
+  }
+
+  public Object getAddressesEq(String input) throws CTPException {
+    MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
+    queryParams.add("input", input);
+
+    // Match AI behaviour, which has a higher limit if it detects a postcode
+    int limit;
+    if (input.matches("[A-Za-z]{1,2}[0-9].*")) {
+      limit = 100;
+    } else {
+      limit = 20;
+    }
+
+    String response = (String) invokeAI(RequestType.AI_EQ, queryParams, 0, limit, (String) null);
+
+    return response;
   }
 
   public Object getAddressesRhUprn(String uprn) throws CTPException {

@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: mock-ai
-        image: europe-west2-docker.pkg.dev/ons-ci-int/int-docker-snapshot/mock-ai:SOC-31_Fix_info_endpoint
+        image: europe-west2-docker.pkg.dev/ons-ci-int/int-docker-snapshot/mock-ai:SOC-40_Add_typeahead_endpoint
         imagePullPolicy: Always
         resources:
           requests:

@@ -20,8 +20,23 @@ WL_AI="https://whitelodge-eq-ai-api.census-gcp.onsdigital.uk"
 function compare {
   ENDPOINT=$1
 
-  curl -s -H "Authorization: Bearer $AI_TOKEN" $WL_AI/$ENDPOINT | jq . > /tmp/wl-ai.json
+  # Get the response status codes from genuine and mock AI
+  curl -s -H "Authorization: Bearer $AI_TOKEN" -I $WL_AI/$ENDPOINT | grep HTTP | grep -Eo "[0-9]{3}" > /tmp/wl-ai.status.txt
+  curl -s -I $MOCK_AI/$ENDPOINT | grep HTTP | grep -Eo "[0-9]{3}" > /tmp/mock-ai.status.txt
 
+  # Compare real & mock AI status codes
+  diff "/tmp/wl-ai.status.txt" "/tmp/mock-ai.status.txt" > /dev/null
+  if [ $? -ne 0 ]
+  then
+    echo "*FAIL STATUS*: $ENDPOINT"
+    echo -n "  Genuine: "
+    cat /tmp/wl-ai.status.txt
+    echo -n "  Mock   : "
+    cat /tmp/mock-ai.status.txt
+  fi
+
+  # Get responses from genuine and mock AI
+  curl -s -H "Authorization: Bearer $AI_TOKEN" $WL_AI/$ENDPOINT | jq . > /tmp/wl-ai.json
   curl -s $MOCK_AI/$ENDPOINT | jq . > /tmp/mock-ai.json
 
   # Compare real & mock AI results
@@ -58,11 +73,19 @@ compare "addresses/postcode/EX24LU?offset=2&limit=90"
 compare "addresses/rh/uprn/3244"
 compare "addresses/rh/uprn/100040239948"
 
+# TYPE AHEAD"
+compare "addresses/eq?input=Pineapple"
+compare "addresses/eq?input=Pinea"
+compare "addresses/eq?input=SO1"
+compare "addresses/eq?input=B1"
+compare "addresses/eq?input=B15"
+compare "addresses/eq?input=46%20West%20B153Q"
 
 # Check responses for data with no results in real or mock AI
 compare "addresses/rh/postcode/SO996AB"
 compare "addresses/partial?input=rtoeutheuohh"
 compare "addresses/postcode/SO996AB"
 compare "addresses/rh/uprn/11"
+compare "addresses/eq?input=tcexdeupydhp"
 
 # EOF
