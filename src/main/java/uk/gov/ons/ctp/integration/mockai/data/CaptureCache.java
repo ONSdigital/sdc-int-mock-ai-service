@@ -19,19 +19,22 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.integration.mockai.endpoint.RequestType;
 import uk.gov.ons.ctp.integration.mockai.misc.Constants;
 
 @Slf4j
-public class DataManager {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class CaptureCache {
 
-  public String readCapturedAiResponse(RequestType requestType, String baseFileName)
+  public static String readCapturedAiResponse(RequestType requestType, String baseFileName)
       throws IOException, CTPException {
 
     // Work out where the captured data lives
-    ClassLoader classLoader = getClass().getClassLoader();
+    ClassLoader classLoader = CaptureCache.class.getClassLoader();
     String dataFile = "data" + requestType.getPath() + "/" + baseFileName + ".json";
 
     // Return nothing if data not held for request
@@ -67,10 +70,10 @@ public class DataManager {
    * @return A List containing the names of the files.
    * @throws IOException if something went wrong.
    */
-  public List<String> listCapturedData(RequestType requestType) throws IOException {
+  public static List<String> listCapturedData(RequestType requestType) throws IOException {
 
     // Find all data files for the request type
-    File resourceDir = getRequestTypeCaptureDir(requestType);
+    File resourceDir = CaptureCache.getRequestTypeCaptureDir(requestType);
     File[] matchingFiles =
         resourceDir.listFiles(
             new FilenameFilter() {
@@ -82,7 +85,7 @@ public class DataManager {
     // Tidy up file names
     ArrayList<String> fileNames = new ArrayList<>();
     for (File file : matchingFiles) {
-      fileNames.add(denormaliseFileName(file.getName()));
+      fileNames.add(CaptureCache.denormaliseFileName(file.getName()));
     }
 
     // Sort names so that longer versions appear first. Eg, 'London' would be listed before 'Londo'
@@ -102,9 +105,9 @@ public class DataManager {
   }
 
   // Work out directory name for requests files
-  private File getRequestTypeCaptureDir(RequestType requestType) {
+  private static File getRequestTypeCaptureDir(RequestType requestType) {
     String requestDataDir = "data" + requestType.getPath();
-    ClassLoader classLoader = getClass().getClassLoader();
+    ClassLoader classLoader = CaptureCache.class.getClassLoader();
     File resourceDir = new File(classLoader.getResource(requestDataDir).getFile());
     return resourceDir;
   }
@@ -119,7 +122,7 @@ public class DataManager {
    * @throws IOException If the was a failure to read the file.
    * @throws FileNotFoundException Should not happen.
    */
-  public Properties getInventory(RequestType requestType)
+  public static Properties getInventory(RequestType requestType)
       throws FileNotFoundException, IOException {
     // Work out path to inventory file
     File resourceDir = getRequestTypeCaptureDir(requestType);
@@ -134,14 +137,14 @@ public class DataManager {
     return prop;
   }
 
-  public String normaliseFileName(String name) {
+  public static String normaliseFileName(String name) {
     String trimmedName = name.trim();
     String cleanedName = trimmedName.replaceAll(" ", "-");
 
     return cleanedName;
   }
 
-  private String denormaliseFileName(String name) {
+  private static String denormaliseFileName(String name) {
     String baseName = name.replace(".json", "");
     String originalName = baseName.replaceAll("-", " ");
 

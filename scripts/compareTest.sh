@@ -74,8 +74,12 @@ compare "addresses/rh/uprn/3244"
 compare "addresses/rh/uprn/100040239948"
 
 # TYPE AHEAD"
-compare "addresses/eq?input=SO1"
 compare "addresses/eq?input=Pineapple"
+compare "addresses/eq?input=Pinea"
+compare "addresses/eq?input=SO1"
+compare "addresses/eq?input=B1"
+compare "addresses/eq?input=B15"
+compare "addresses/eq?input=46%20West%20B153Q"
 
 # Check responses for data with no results in real or mock AI
 compare "addresses/rh/postcode/SO996AB"

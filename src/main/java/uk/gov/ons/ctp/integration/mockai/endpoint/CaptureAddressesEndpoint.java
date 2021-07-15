@@ -20,7 +20,7 @@ import uk.gov.ons.ctp.common.endpoint.CTPEndpoint;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.CTPException.Fault;
 import uk.gov.ons.ctp.integration.mockai.client.AddressIndexClient;
-import uk.gov.ons.ctp.integration.mockai.data.DataManager;
+import uk.gov.ons.ctp.integration.mockai.data.CaptureCache;
 import uk.gov.ons.ctp.integration.mockai.model.AddressesRhPostcodeRequestDTO;
 
 /**
@@ -34,8 +34,6 @@ import uk.gov.ons.ctp.integration.mockai.model.AddressesRhPostcodeRequestDTO;
 @RequestMapping(value = "", produces = "application/json")
 public final class CaptureAddressesEndpoint implements CTPEndpoint {
   @Autowired private AddressIndexClient addressIndexClient;
-
-  DataManager dataManager = new DataManager();
 
   @RequestMapping(value = "/capture/addresses/rh/postcode/{postcode}", method = RequestMethod.GET)
   public Object getAddressesRhPostcode(
@@ -118,7 +116,7 @@ public final class CaptureAddressesEndpoint implements CTPEndpoint {
 
     // Output json data to file in the compiled target file hierarchy (for immediate use)
     File targetCaptureDir = new File(targetDataDir, requestType.getPath());
-    String outputFileName = dataManager.normaliseFileName(name) + ".json";
+    String outputFileName = CaptureCache.normaliseFileName(name) + ".json";
     writeJsonFile(targetCaptureDir, outputFileName, capturedResponse, false);
 
     // Output json data to file in the source tree (for long term storage)
@@ -144,7 +142,12 @@ public final class CaptureAddressesEndpoint implements CTPEndpoint {
     }
 
     // Convert object to json
-    String json = new ObjectMapper().writeValueAsString(capturedResponse);
+    String json;
+    if (capturedResponse instanceof String) {
+      json = (String) capturedResponse;
+    } else {
+      json = new ObjectMapper().writeValueAsString(capturedResponse);
+    }
 
     // Write AI response json to file
     File outputFile = new File(dir, fileName);

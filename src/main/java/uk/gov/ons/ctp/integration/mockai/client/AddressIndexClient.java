@@ -143,7 +143,15 @@ public class AddressIndexClient {
     MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
     queryParams.add("input", input);
 
-    String response = (String) invokeAI(RequestType.AI_EQ, queryParams, 0, 20, (String) null);
+    // Match AI behaviour, which has a higher limit if it detects a postcode
+    int limit;
+    if (input.matches("[A-Za-z]{1,2}[0-9].*")) {
+      limit = 100;
+    } else {
+      limit = 20;
+    }
+
+    String response = (String) invokeAI(RequestType.AI_EQ, queryParams, 0, limit, (String) null);
 
     return response;
   }
