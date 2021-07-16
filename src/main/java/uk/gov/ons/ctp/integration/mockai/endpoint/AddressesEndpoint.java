@@ -24,7 +24,7 @@ import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexPostcode
 import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexPostcodeResultsDTO;
 import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexRhPostcodeAddressDTO;
 import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexRhPostcodeResultsDTO;
-import uk.gov.ons.ctp.integration.mockai.data.DataManager;
+import uk.gov.ons.ctp.integration.mockai.data.CaptureCache;
 import uk.gov.ons.ctp.integration.mockai.misc.Constants;
 import uk.gov.ons.ctp.integration.mockai.model.AddressesPartialRequestDTO;
 import uk.gov.ons.ctp.integration.mockai.model.AddressesPostcodeRequestDTO;
@@ -36,8 +36,6 @@ import uk.gov.ons.ctp.integration.mockai.model.AddressesRhUprnRequestDTO;
 @RestController
 @RequestMapping(value = "", produces = "application/json")
 public final class AddressesEndpoint implements CTPEndpoint {
-
-  private DataManager dataManager = new DataManager();
 
   @RequestMapping(value = "/addresses/rh/postcode/{postcode}", method = RequestMethod.GET)
   public ResponseEntity<Object> getAddressesRhPostcode(
@@ -117,16 +115,21 @@ public final class AddressesEndpoint implements CTPEndpoint {
       RequestType requestType, String name, int offset, int limit)
       throws IOException, CTPException {
 
-    String baseFileName = dataManager.normaliseFileName(name);
+    String baseFileName = CaptureCache.normaliseFileName(name);
 
     HttpStatus responseStatus = HttpStatus.OK;
     Object response = null;
-    String responseText = dataManager.readCapturedAiResponse(requestType, baseFileName);
+    String responseText = CaptureCache.readCapturedAiResponse(requestType, baseFileName);
 
     if (responseText != null) {
       // Convert captured AI response to an object, and return the target subset of data
-      response =
-          new ObjectMapper().readerFor(requestType.getResponseClass()).readValue(responseText);
+      if (requestType.getResponseClass().equals(String.class)) {
+        // Don't push it through Jackson, as it is already in String format
+        response = responseText;
+      } else {
+        response =
+            new ObjectMapper().readerFor(requestType.getResponseClass()).readValue(responseText);
+      }
 
       switch (requestType) {
         case AI_RH_POSTCODE:
@@ -175,7 +178,7 @@ public final class AddressesEndpoint implements CTPEndpoint {
     } else {
       // 404 - not found
       responseStatus = requestType.getNotFoundHttpStatus();
-      responseText = dataManager.readCapturedAiResponse(requestType, Constants.NO_DATA_FILE_NAME);
+      responseText = CaptureCache.readCapturedAiResponse(requestType, Constants.NO_DATA_FILE_NAME);
 
       // Customise the not-found response by replacing any place holders with actual values
       String placeholderName = requestType.getPlaceholderName();

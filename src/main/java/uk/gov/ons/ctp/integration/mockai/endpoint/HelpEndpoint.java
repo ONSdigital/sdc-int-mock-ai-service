@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.ons.ctp.common.endpoint.CTPEndpoint;
-import uk.gov.ons.ctp.integration.mockai.data.DataManager;
+import uk.gov.ons.ctp.integration.mockai.data.CaptureCache;
 
 /**
  * This class holds the /help endpoint to provide a list of supported endpoints and the available
@@ -74,15 +74,14 @@ public final class HelpEndpoint implements CTPEndpoint {
       helpText.append("  " + requestType.getUrl() + "\n");
 
       // Get list of data for this request
-      DataManager dataManager = new DataManager();
-      List<String> dataFiles = dataManager.listCapturedData(requestType);
+      List<String> dataFiles = CaptureCache.listCapturedData(requestType);
 
       // Load optional property file, for descriptions on the data held
-      Properties props = dataManager.getInventory(requestType);
+      Properties props = CaptureCache.getInventory(requestType);
 
       // List data items held
       for (String name : dataFiles) {
-        String normalisedName = dataManager.normaliseFileName(name);
+        String normalisedName = CaptureCache.normaliseFileName(name);
         String dataDescription = props.getProperty(normalisedName, null);
         String dataText = describeData(normalisedName, dataDescription);
         helpText.append("    " + dataText + "\n");
