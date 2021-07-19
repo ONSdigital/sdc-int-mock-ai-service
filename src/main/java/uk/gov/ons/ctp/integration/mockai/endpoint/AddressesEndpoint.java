@@ -184,7 +184,7 @@ public final class AddressesEndpoint implements CTPEndpoint {
       String placeholderName = requestType.getPlaceholderName();
       if (placeholderName != null) {
         String fullPlaceholderName = "%" + placeholderName + "%";
-        responseText = responseText.replace(fullPlaceholderName, baseFileName);
+        responseText = responseText.replace(fullPlaceholderName, name);
       }
 
       response = responseText;
