@@ -83,7 +83,7 @@ public class CaptureCache {
     // Build list of file names
     ArrayList<String> fileNames = new ArrayList<>();
     for (Resource resource : jsonFiles) {
-      String fileName = resource.getFile().getName();
+      String fileName = resource.getFilename();
       if (!fileName.startsWith(Constants.INTERNAL_FILE_NAME_PREFIX)) {
         fileNames.add(CaptureCache.denormaliseFileName(fileName));
       }
