@@ -55,6 +55,7 @@ compare "addresses/rh/postcode/CF32TW"
 compare "addresses/rh/postcode/CF32TW?offset=1"
 compare "addresses/rh/postcode/CF32TW?limit=3"
 compare "addresses/rh/postcode/CF32TW?offset=101&limit=8"
+compare "addresses/rh/postcode/CF3%202TW"
 
 # PARTIAL
 compare "addresses/partial?input=Shirley"
@@ -83,8 +84,10 @@ compare "addresses/eq?input=46%20West%20B153Q"
 
 # Check responses for data with no results in real or mock AI
 compare "addresses/rh/postcode/SO996AB"
+compare "addresses/rh/postcode/SO31%209UP"
 compare "addresses/partial?input=rtoeutheuohh"
 compare "addresses/postcode/SO996AB"
+compare "addresses/postcode/SO31%209UP"
 compare "addresses/rh/uprn/11"
 compare "addresses/eq?input=tcexdeupydhp"
 
