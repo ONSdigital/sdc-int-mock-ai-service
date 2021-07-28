@@ -6,7 +6,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -19,6 +18,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
+
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -73,19 +76,17 @@ public class CaptureCache {
   public static List<String> listCapturedData(RequestType requestType) throws IOException {
 
     // Find all data files for the request type
-    File resourceDir = CaptureCache.getRequestTypeCaptureDir(requestType);
-    File[] matchingFiles =
-        resourceDir.listFiles(
-            new FilenameFilter() {
-              public boolean accept(File dir, String name) {
-                return !name.startsWith(Constants.INTERNAL_FILE_NAME_PREFIX);
-              }
-            });
+	PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+	String resourcePath = "classpath*:data" + requestType.getPath() + "/*.json";
+	Resource[] jsonFiles = resolver.getResources(resourcePath);
 
-    // Tidy up file names
+    // Build list of file names
     ArrayList<String> fileNames = new ArrayList<>();
-    for (File file : matchingFiles) {
-      fileNames.add(CaptureCache.denormaliseFileName(file.getName()));
+    for (Resource resource : jsonFiles) {
+      String fileName = resource.getFilename();
+      if (!fileName.startsWith(Constants.INTERNAL_FILE_NAME_PREFIX)) {
+        fileNames.add(CaptureCache.denormaliseFileName(fileName));
+      }
     }
 
     // Sort names so that longer versions appear first. Eg, 'London' would be listed before 'Londo'
