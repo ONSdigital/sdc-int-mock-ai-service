@@ -20,6 +20,7 @@ find . -name "*json" | grep -v notFound > $TMP_FILE
 # Convert the list of captured files into curl commands
 sed -i ".bak" 's|-|%20|g' $TMP_FILE
 sed -i ".bak" 's|/partial/|/partial?input=|g' $TMP_FILE
+sed -i ".bak" 's|/addresses/eq/|/addresses/eq?input=|g' $TMP_FILE
 sed -i ".bak" 's|^.|curl -s localhost:8162/capture|g' $TMP_FILE
 sed -i ".bak" 's|.json$||g' $TMP_FILE
 

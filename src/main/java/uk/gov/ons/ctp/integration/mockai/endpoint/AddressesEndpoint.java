@@ -1,19 +1,13 @@
 package uk.gov.ons.ctp.integration.mockai.endpoint;
 
+import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.v;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import javax.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +24,7 @@ import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexPostcode
 import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexPostcodeResultsDTO;
 import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexRhPostcodeAddressDTO;
 import uk.gov.ons.ctp.integration.mockai.addressindex.model.AddressIndexRhPostcodeResultsDTO;
+import uk.gov.ons.ctp.integration.mockai.data.CaptureCache;
 import uk.gov.ons.ctp.integration.mockai.misc.Constants;
 import uk.gov.ons.ctp.integration.mockai.model.AddressesPartialRequestDTO;
 import uk.gov.ons.ctp.integration.mockai.model.AddressesPostcodeRequestDTO;
@@ -37,40 +32,20 @@ import uk.gov.ons.ctp.integration.mockai.model.AddressesRhPostcodeRequestDTO;
 import uk.gov.ons.ctp.integration.mockai.model.AddressesRhUprnRequestDTO;
 
 /** Provides mock endpoints for a subset of the AI /addresses endpoints. */
+@Slf4j
 @RestController
 @RequestMapping(value = "", produces = "application/json")
 public final class AddressesEndpoint implements CTPEndpoint {
-  private static final Logger log = LoggerFactory.getLogger(AddressesEndpoint.class);
-
-  @RequestMapping(value = "/addresses/info", method = RequestMethod.GET)
-  public ResponseEntity<String> info() {
-    return ResponseEntity.ok(
-        "      << MOCK AI >>\n"
-            + "Supported addresses endpoints:\n"
-            + "  "
-            + RequestType.AI_RH_POSTCODE.getUrl()
-            + "\n"
-            + "  "
-            + RequestType.AI_PARTIAL.getUrl()
-            + "\n"
-            + "  "
-            + RequestType.AI_POSTCODE.getUrl()
-            + "\n"
-            + "  "
-            + RequestType.AI_RH_UPRN.getUrl()
-            + "\n");
-  }
 
   @RequestMapping(value = "/addresses/rh/postcode/{postcode}", method = RequestMethod.GET)
   public ResponseEntity<Object> getAddressesRhPostcode(
       @PathVariable(value = "postcode") String postcode,
       @Valid AddressesRhPostcodeRequestDTO requestParamsDTO)
       throws IOException, CTPException {
+
     RequestType requestType = RequestType.AI_RH_POSTCODE;
+    log.info("Request {}/{}", requestType.getPath(), v("postcode", postcode));
 
-    log.with("postcode", postcode).info("Request " + requestType.getPath() + "/" + postcode);
-
-    postcode = postcode.replaceAll(" ", "").trim();
     ResponseEntity<Object> response =
         simulateAIResponse(
             requestType, postcode, requestParamsDTO.getOffset(), requestParamsDTO.getLimit());
@@ -83,14 +58,13 @@ public final class AddressesEndpoint implements CTPEndpoint {
       @RequestParam(required = true) String input,
       @Valid AddressesPartialRequestDTO requestParamsDTO)
       throws IOException, CTPException {
+
     RequestType requestType = RequestType.AI_PARTIAL;
+    log.info("Request {}", requestType.getPath() + "?input=" + input);
 
-    log.with("input", input).info("Request " + requestType.getPath());
-
-    String cleanedInput = input.replaceAll(" ", "-").trim();
     ResponseEntity<Object> response =
         simulateAIResponse(
-            requestType, cleanedInput, requestParamsDTO.getOffset(), requestParamsDTO.getLimit());
+            requestType, input, requestParamsDTO.getOffset(), requestParamsDTO.getLimit());
 
     return response;
   }
@@ -100,11 +74,10 @@ public final class AddressesEndpoint implements CTPEndpoint {
       @PathVariable(value = "postcode") String postcode,
       @Valid AddressesPostcodeRequestDTO requestParamsDTO)
       throws IOException, CTPException {
+
     RequestType requestType = RequestType.AI_POSTCODE;
+    log.info("Request {}/{}", requestType.getPath(), v("postcode", postcode));
 
-    log.with("postcode", postcode).info("Request " + requestType.getPath() + "/" + postcode);
-
-    postcode = postcode.replaceAll(" ", "").trim();
     ResponseEntity<Object> response =
         simulateAIResponse(
             requestType, postcode, requestParamsDTO.getOffset(), requestParamsDTO.getLimit());
@@ -116,28 +89,47 @@ public final class AddressesEndpoint implements CTPEndpoint {
   public ResponseEntity<Object> getAddressesRhUprn(
       @PathVariable(value = "uprn") String uprn, @Valid AddressesRhUprnRequestDTO requestParamsDTO)
       throws IOException, CTPException {
+
     RequestType requestType = RequestType.AI_RH_UPRN;
+    log.info("Request {}/{}", requestType.getPath(), v("uprn", uprn));
 
-    log.with("uprn", uprn).info("Request " + requestType.getPath() + "/" + uprn);
-
-    uprn = uprn.replaceAll(" ", "").trim();
     ResponseEntity<Object> response = simulateAIResponse(requestType, uprn, 0, 1);
+
+    return response;
+  }
+
+  @RequestMapping(value = "/addresses/eq", method = RequestMethod.GET)
+  public ResponseEntity<Object> getAddressesEq(@RequestParam(required = true) String input)
+      throws IOException, CTPException {
+
+    RequestType requestType = RequestType.AI_EQ;
+    log.info("Request {}", requestType.getUrl() + "?input=" + input);
+
+    ResponseEntity<Object> response = simulateAIResponse(requestType, input, 0, 10);
 
     return response;
   }
 
   @SuppressWarnings("unchecked")
   private ResponseEntity<Object> simulateAIResponse(
-      RequestType requestType, String baseFileName, int offset, int limit)
+      RequestType requestType, String name, int offset, int limit)
       throws IOException, CTPException {
+
+    String baseFileName = CaptureCache.normaliseFileName(name);
+
     HttpStatus responseStatus = HttpStatus.OK;
     Object response = null;
-    String responseText = readCapturedAiResponse(requestType, baseFileName);
+    String responseText = CaptureCache.readCapturedAiResponse(requestType, baseFileName);
 
     if (responseText != null) {
       // Convert captured AI response to an object, and return the target subset of data
-      response =
-          new ObjectMapper().readerFor(requestType.getResponseClass()).readValue(responseText);
+      if (requestType.getResponseClass().equals(String.class)) {
+        // Don't push it through Jackson, as it is already in String format
+        response = responseText;
+      } else {
+        response =
+            new ObjectMapper().readerFor(requestType.getResponseClass()).readValue(responseText);
+      }
 
       switch (requestType) {
         case AI_RH_POSTCODE:
@@ -173,6 +165,9 @@ public final class AddressesEndpoint implements CTPEndpoint {
           postcodes.getResponse().setOffset(offset);
           postcodes.getResponse().setLimit(limit);
           break;
+        case AI_EQ:
+          // Nothing to do for type-ahead response
+          break;
         case AI_RH_UPRN:
           // Nothing to do for uprn results
           break;
@@ -182,14 +177,14 @@ public final class AddressesEndpoint implements CTPEndpoint {
       }
     } else {
       // 404 - not found
-      responseStatus = HttpStatus.NOT_FOUND;
-      responseText = readCapturedAiResponse(requestType, Constants.NO_DATA_FILE_NAME);
+      responseStatus = requestType.getNotFoundHttpStatus();
+      responseText = CaptureCache.readCapturedAiResponse(requestType, Constants.NO_DATA_FILE_NAME);
 
-      // Replace any place holders with actual values
+      // Customise the not-found response by replacing any place holders with actual values
       String placeholderName = requestType.getPlaceholderName();
       if (placeholderName != null) {
         String fullPlaceholderName = "%" + placeholderName + "%";
-        responseText = responseText.replace(fullPlaceholderName, baseFileName);
+        responseText = responseText.replace(fullPlaceholderName, name);
       }
 
       response = responseText;
@@ -206,36 +201,5 @@ public final class AddressesEndpoint implements CTPEndpoint {
     int toIndex = Math.min(offset + limit, addresses.size());
 
     return addresses.subList(offset, toIndex);
-  }
-
-  private String readCapturedAiResponse(RequestType requestType, String baseFileName)
-      throws IOException, CTPException {
-    // Work out where the captured data lives
-    ClassLoader classLoader = getClass().getClassLoader();
-    String resourceName = "data" + requestType.getPath() + "/" + baseFileName + ".json";
-
-    // Return nothing if data not held for request
-    URL resource = classLoader.getResource(resourceName);
-    if (resource == null) {
-      log.with("baseFileName", baseFileName)
-          .with("resource", resourceName)
-          .with("requestType", requestType.name())
-          .info("No captured response");
-      return null;
-    }
-
-    // Read AI captured response
-    InputStream targetDataUrl = resource.openStream();
-    StringBuilder responseBuilder = new StringBuilder();
-    try (Reader reader =
-        new BufferedReader(
-            new InputStreamReader(targetDataUrl, Charset.forName(StandardCharsets.UTF_8.name())))) {
-      int c = 0;
-      while ((c = reader.read()) != -1) {
-        responseBuilder.append((char) c);
-      }
-    }
-
-    return responseBuilder.toString();
   }
 }
